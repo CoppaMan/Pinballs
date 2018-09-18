@@ -50,3 +50,5 @@ Compile and run the executable, e.g.:
 make && ./0_dummy
 ```
 Or use your favorite IDE.
+
+To update your forked repository, check this page: [how-do-i-update-a-github-forked-repository](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository)
