@@ -1,0 +1,75 @@
+#include "BaseObject.h"
+#include <igl/per_face_normals.h>
+#include <igl/per_vertex_normals.h>
+#include <igl/readOBJ.h>
+#include <igl/readOFF.h>
+
+bool BaseObject::loadMesh(const std::string& path) {
+    bool succ = false;
+
+    std::ifstream infile(path);
+    if (!infile.good()) {
+        return false;
+    }
+
+    const std::string OFF(".off");
+    if (path.compare(path.size() - OFF.size(), OFF.size(), OFF) == 0) {
+        succ = igl::readOFF(path, m_mesh.V, m_mesh.F, m_mesh.V_normals);
+        if (succ) {
+            std::cout << "Reading OFF-file from " << path << " ..."
+                      << std::endl;
+        }
+    }
+
+    const std::string OBJ(".obj");
+    if (path.compare(path.size() - OBJ.size(), OBJ.size(), OBJ) == 0) {
+        succ = igl::readOBJ(path, m_mesh.V, m_mesh.F);
+        if (succ) {
+            std::cout << "Reading OBJ-file from " << path << " ..."
+                      << std::endl;
+            igl::per_vertex_normals(m_mesh.V, m_mesh.F, m_mesh.V_normals);
+        }
+    }
+    return succ;
+}
+
+void BaseObject::findAndLoadMesh(const std::string& file) {
+    if (loadMesh(file)) return;
+    if (loadMesh("data/" + file)) return;
+    if (loadMesh("../data/" + file)) return;
+    if (loadMesh("../../data/" + file)) return;
+    if (loadMesh("../../../data/" + file)) return;
+    std::cerr << "Failed to find " << file << std::endl;
+}
+
+void BaseObject::reset() {
+    setPosition(Eigen::Vector3d::Zero());
+    setRotation(Eigen::Matrix3d::Identity());
+    resetMembers();
+}
+
+void BaseObject::setScale(double s) { m_scale = s; }
+
+void BaseObject::setID(int id) { m_id = id; }
+
+void BaseObject::setPosition(const Eigen::Vector3d& p) { m_position = p; }
+
+void BaseObject::setRotation(const Eigen::Quaterniond& q) {
+    m_quat = q;
+    m_rot = q.toRotationMatrix();
+}
+
+void BaseObject::setRotation(const Eigen::Matrix3d& R) {
+    m_rot = R;
+    m_quat = R;
+}
+
+double BaseObject::getScale() { return m_scale; }
+
+int BaseObject::getID() { return m_id; }
+
+Eigen::Vector3d BaseObject::getPosition() { return m_position; }
+
+Eigen::Quaterniond BaseObject::getRotation() { return m_quat; }
+
+Eigen::Matrix3d BaseObject::getRotationMatrix() { return m_rot; }
