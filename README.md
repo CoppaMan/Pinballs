@@ -29,7 +29,7 @@ On Windows you can download it from:
 
 
 ### Cloning the Exercise Repository
-Before you are able to clone your private exercise repository, you need to have an active [Gitlabvis](https://gitlab.vis.ethz.ch/) account. Then send me your *ETH Nethz id* to add you so that you can [fork](https://docs.gitlab.com/ee/gitlab-basics/fork-project.html) this project to create your own private online repository.
+Before you are able to clone your private exercise repository, you need to have an active [Gitlabvis](https://gitlab.vis.ethz.ch/) account. Then you can [fork](https://docs.gitlab.com/ee/gitlab-basics/fork-project.html) this project to create your own private online repository.
 
 In the next step you need to clone it to your local hard drive:
 ```
