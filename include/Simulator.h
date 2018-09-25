@@ -6,6 +6,7 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <mutex>
+#include <queue>
 #include <thread>
 
 using namespace std::chrono;
@@ -24,7 +25,8 @@ class Simulator {
           m_please_pause(false),
           m_please_die(false),
           m_running(false),
-          m_started(false) {}
+          m_started(false),
+          m_recording(false) {}
 
     virtual ~Simulator() {
         killSimulatorThread();
@@ -59,6 +61,8 @@ class Simulator {
         }
         m_please_die = m_running = m_started = false;
         m_please_pause = true;
+        clearRecords();
+        setRecording(m_recording);
         p_simulation->reset();
         p_simulation->updateRenderGeometry();
         p_simulator_thread = new std::thread(&Simulator::runSimThread, this);
@@ -100,7 +104,52 @@ class Simulator {
 
     unsigned long getSimulationStep() const { return p_simulation->getStep(); }
 
+    void setSimulationSpeed(int speed) {
+        m_maxTimePerStep = std::round(1000 / speed);
+    }
+
+    // set maximum number of timesteps after which the simulation will stop, -1
+    // for infinite simulation
+    void setMaxSteps(int n = -1) { m_maxSteps = n; }
+
+    void clearRecords() {
+        for (size_t i = 0; i < m_record.size(); i++) {
+            m_record[i] =
+                std::queue<std::pair<Eigen::MatrixXd, Eigen::MatrixXi>>();
+        }
+    }
+
+    void setRecording(bool r) {
+        if (r && m_record.size() == 0) {
+            m_record.resize(p_simulation->getObjects().size());
+        } else {
+            clearRecords();
+        }
+        m_recording = r;
+    }
+
+    bool isRecording() const { return m_recording; }
+
+    void setNumRecords(int n) { m_numRecords = n; }
+
+    std::vector<std::queue<std::pair<Eigen::MatrixXd, Eigen::MatrixXi>>>
+        &getRecords() {
+        return m_record;
+    }
+
    protected:
+    void storeRecord() {
+        auto os = p_simulation->getObjects();
+        Eigen::MatrixXd V;
+        Eigen::MatrixXi F;
+        for (size_t i = 0; i < os.size(); i++) {
+            os[i].getMesh(V, F);
+            m_record[i].push(std::make_pair(V, F));
+            while (m_record[i].size() > (size_t)m_numRecords) {
+                m_record[i].pop();
+            }
+        }
+    }
     void runSimThread() {
         m_status_mutex.lock();
         m_running = true;
@@ -116,11 +165,20 @@ class Simulator {
                 // don't use to much CPU time
                 std::this_thread::sleep_for(milliseconds(10));
             } else {
+                if (m_maxSteps >= 0 && m_maxSteps <= p_simulation->getStep()) {
+                    pause();
+                    continue;
+                }
+
                 // time execution of one loop (advance + rendering)
                 high_resolution_clock::time_point start =
                     high_resolution_clock::now();
 
                 done = p_simulation->advance();
+
+                if (m_recording) {
+                    storeRecord();
+                }
 
                 m_render_mutex.lock();
                 p_simulation->updateRenderGeometry();
@@ -131,9 +189,12 @@ class Simulator {
 
                 m_duration = end - start;
 
-                // sleep such that simulation runs at approximately 60fps
-                std::this_thread::sleep_for(
-                    milliseconds(17) - duration_cast<milliseconds>(m_duration));
+                // sleep such that simulation runs at the set iterations per
+                // second
+                milliseconds sleepTime =
+                    milliseconds(m_maxTimePerStep) -
+                    duration_cast<milliseconds>(m_duration);
+                std::this_thread::sleep_for(sleepTime);
             }
 
             m_status_mutex.lock();
@@ -164,8 +225,16 @@ class Simulator {
     bool m_please_die;
     bool m_running;
     bool m_started;
+    int m_maxTimePerStep;
+    int m_maxSteps = -1;  // max number of steps to perform, -1 for infinite
+
     std::mutex m_render_mutex;
     std::mutex m_status_mutex;
+
+    bool m_recording;
+    int m_numRecords;
+    std::vector<std::queue<std::pair<Eigen::MatrixXd, Eigen::MatrixXi>>>
+        m_record;  // one queue of (vertices, faces)-pairs for every object
 };
 
 #endif

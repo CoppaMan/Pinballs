@@ -2,6 +2,7 @@
 #define SIMULATION_H
 
 #include <igl/opengl/glfw/Viewer.h>
+#include "RigidObject.h"
 
 /*
  * Base class for different kinds of simulation. Provides methods for
@@ -56,9 +57,11 @@ class Simulation {
 
     void setTimestep(double t) { m_dt = t; }
 
-    double getTime() { return m_time; }
+    double getTime() const { return m_time; }
 
-    unsigned long getStep() { return m_step; }
+    unsigned long getStep() const { return m_step; }
+
+    std::vector<RigidObject> &getObjects() { return m_objects; }
 
    protected:
     /*
@@ -67,6 +70,8 @@ class Simulation {
      */
     virtual void resetMembers() = 0;
 
+    std::vector<RigidObject>
+        m_objects;             // vector of all objects in the simulation
     double m_dt = 0.0;         // length of timestep
     double m_time = 0.0;       // current time
     unsigned long m_step = 0;  // number of performed steps in simulation

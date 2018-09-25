@@ -28,3 +28,5 @@ if (NOT LIBIGL_FOUND)
 endif()
 
 add_subdirectory(0_dummy)
+add_subdirectory(1_cannonball)
+add_subdirectory(2_spring)

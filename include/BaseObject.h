@@ -22,6 +22,8 @@ struct Mesh {
     Eigen::MatrixXi F_uv;  // optional faces for UVs
 };
 
+enum class ObjType { STATIC, DYNAMIC };
+
 class BaseObject {
    public:
     bool loadMesh(const std::string& path);
@@ -32,15 +34,19 @@ class BaseObject {
 
     void setScale(double s);
     void setID(int id);
+    virtual void setType(ObjType t);
     void setPosition(const Eigen::Vector3d& p);
     void setRotation(const Eigen::Quaterniond& q);
     void setRotation(const Eigen::Matrix3d& R);
 
-    double getScale();
-    int getID();
-    Eigen::Vector3d getPosition();
-    Eigen::Quaterniond getRotation();
-    Eigen::Matrix3d getRotationMatrix();
+    double getScale() const;
+    int getID() const;
+    ObjType getType() const;
+    Eigen::Vector3d getPosition() const;
+    Eigen::Quaterniond getRotation() const;
+    Eigen::Matrix3d getRotationMatrix() const;
+    Eigen::Vector3d getVertexPosition(int vertexIndex) const;
+    void getMesh(Eigen::MatrixXd& V, Eigen::MatrixXi& F) const;
 
    protected:
     /*
@@ -51,6 +57,7 @@ class BaseObject {
 
     int m_id = -1;
     Mesh m_mesh;
+    ObjType m_type;
 
     double m_scale = 1.0;        // Scale
     Eigen::Vector3d m_position;  // Position of the center of mass

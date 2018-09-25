@@ -77,19 +77,31 @@ class Gui {
      */
     void showAxes(bool show_axes);
 
+    /*
+     * Callback to show a different vector for a clicked vertex than the normal
+     */
+    std::function<void(int clickedVertexIndex, int clickedObjectIndex,
+                       Eigen::Vector3d &pos, Eigen::Vector3d &dir)>
+        callback_clicked_vertex = nullptr;
+
    private:
     void drawArrow(const Arrow &arrow);
 
-    void showNormal();
+    void showVertexArrow();
 
     void toggleSimulation();
 
     void resetSimulation();
 
+    void exportRecording();
+
     void clearScreen();
 
     bool keyCallback(igl::opengl::glfw::Viewer &viewer, unsigned int key,
                      int modifiers);
+
+    bool keyReleasedCallback(igl::opengl::glfw::Viewer &viewer,
+                             unsigned int key, int modifiers);
 
     void drawMenuWindow(igl::opengl::glfw::imgui::ImGuiMenu &menu);
 
@@ -108,6 +120,8 @@ class Gui {
 
     Simulator *p_simulator = NULL;
     bool m_request_clear = false;
+    int m_simSpeed = 60;
+    bool m_fastForward = false;
 
     int m_clickedVertex = -1;     // index of clicked vertex
     int m_clickedObject = -1;     // id of clicked object
@@ -120,8 +134,11 @@ class Gui {
     bool m_showAxes = true;
 
     bool m_showStats = true;
-    double m_timerAverage;  // running average of execution time of
-                            // one iteration of the simulation
+    double m_timerAverage = 0;  // running average of execution time of
+                                // one iteration of the simulation
+    int m_maxSteps = -1;
+    
+    int m_numRecords = 100;  // number of records to keep
 };
 
 #endif

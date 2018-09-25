@@ -1,14 +1,35 @@
 #include "Gui.h"
 #include <igl/Hit.h>
 #include <igl/project.h>
-#include <igl/unproject_in_mesh.h>
+#include <igl/writeOFF.h>
+#include <iomanip>
+#include <sstream>
 
 void Gui::setSimulation(Simulation *sim) {
     p_simulator = new Simulator(sim);
     p_simulator->reset();
+    p_simulator->setSimulationSpeed(m_simSpeed);
 }
 
 void Gui::start() {
+    // message
+    std::string usage(
+        R"(          ooooooooo.   oooooooooo.   .oooooo..o        .o   .ooooo.   
+          `888   `Y88. `888'   `Y8b d8P'    `Y8      o888  d88'   `8. 
+           888   .d88'  888     888 Y88bo.            888  Y88..  .8' 
+           888ooo88P'   888oooo888'  `"Y8888o.        888   `88888b.  
+           888          888    `88b      `"Y88b       888  .8'  ``88b 
+           888          888    .88P oo     .d8P       888  `8.   .88P 
+          o888o        o888bood8P'  8""88888P'       o888o  `boood8'  
+  
+  Shortcuts:
+  [drag] Rotate scene                 |  [space] Start/pause simulation
+  I,i    Toggle invert normals        |  R,r     Reset simulation
+  L,l    Toggle wireframe             |  C,c     Clear screen
+  T,t    Toggle filled faces          |  -       Toggle fast forward
+  ;      Toggle vertex labels
+  :      Toggle face labels)");
+    std::cout << usage << std::endl;
     // setting up viewer
     m_viewer.data().set_face_based(true);
     m_viewer.data().show_lines = false;
@@ -22,6 +43,8 @@ void Gui::start() {
     m_viewer.plugins.push_back(&menu);
     menu.callback_draw_viewer_window = [&]() { drawMenuWindow(menu); };
     showAxes(m_showAxes);
+    p_simulator->setNumRecords(m_numRecords);
+    p_simulator->setMaxSteps(m_maxSteps);
 
     // callbacks
     m_viewer.callback_key_pressed = [&](igl::opengl::glfw::Viewer &viewer,
@@ -87,16 +110,22 @@ void Gui::drawArrow(const Arrow &arrow) {
 }
 #pragma endregion ArrowInterface
 
-void Gui::showNormal() {
+void Gui::showVertexArrow() {
     if (m_clickedArrow >= 0) {
         removeArrow(m_clickedArrow);
         m_clickedArrow = -1;
     }
     if (m_clickedVertex >= 0) {
-        Eigen::RowVector3d pos =
-            m_viewer.data_list[m_clickedObject].V.row(m_clickedVertex);
-        Eigen::RowVector3d norm =
-            m_viewer.data_list[m_clickedObject].V_normals.row(m_clickedVertex);
+        Eigen::Vector3d pos;
+        Eigen::Vector3d norm;
+        if (callback_clicked_vertex) {
+            callback_clicked_vertex(m_clickedVertex, m_clickedObject, pos,
+                                    norm);
+        } else {
+            pos = m_viewer.data_list[m_clickedObject].V.row(m_clickedVertex);
+            norm = m_viewer.data_list[m_clickedObject].V_normals.row(
+                m_clickedVertex);
+        }
         m_clickedArrow =
             addArrow(pos, pos + norm, Eigen::RowVector3d(1.0, 0, 0));
     }
@@ -158,6 +187,35 @@ void Gui::clearScreen() {
 bool Gui::keyCallback(igl::opengl::glfw::Viewer &viewer, unsigned int key,
                       int modifiers) {
     switch (key) {
+        case 'I':
+        case 'i':
+            for (auto &d : viewer.data_list) {
+                d.dirty |= igl::opengl::MeshGL::DIRTY_NORMAL;
+                d.invert_normals = !d.invert_normals;
+            }
+            return true;
+        case 'L':
+        case 'l':
+            for (auto &d : viewer.data_list) {
+                d.show_lines = !d.show_lines;
+            }
+            return true;
+        case 'T':
+        case 't':
+            for (auto &d : viewer.data_list) {
+                d.show_faces = !d.show_faces;
+            }
+            return true;
+        case ';':
+            for (auto &d : viewer.data_list) {
+                d.show_vertid = !d.show_vertid;
+            }
+            return true;
+        case ':':
+            for (auto &d : viewer.data_list) {
+                d.show_faceid = !d.show_faceid;
+            }
+            return true;
         case ' ':
             toggleSimulation();
             return true;
@@ -168,6 +226,14 @@ bool Gui::keyCallback(igl::opengl::glfw::Viewer &viewer, unsigned int key,
         case 'c':
         case 'C':
             clearScreen();
+            return true;
+        case '-':
+            if (!m_fastForward) {
+                p_simulator->setSimulationSpeed(240);
+            } else {
+                p_simulator->setSimulationSpeed(m_simSpeed);
+            }
+            m_fastForward = !m_fastForward;
             return true;
         default:
             return childKeyCallback(viewer, key, modifiers);
@@ -206,7 +272,7 @@ bool Gui::mouseCallback(igl::opengl::glfw::Viewer &viewer,
         // only select vertex if user clicked "close"
         m_clickedVertex = vertex;
         m_clickedObject = object;
-        showNormal();
+        showVertexArrow();
     }
     return false;
 }
@@ -232,9 +298,9 @@ void Gui::drawMenuWindow(igl::opengl::glfw::imgui::ImGuiMenu &menu) {
 
     // Clicking
     if (m_clickedVertex >= 0) {
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize,
-                                 ImGuiSetCond_Always);
+                                 ImGuiSetCond_FirstUseEver);
         bool visible = true;
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
@@ -267,7 +333,7 @@ void Gui::drawMenuWindow(igl::opengl::glfw::imgui::ImGuiMenu &menu) {
         ImGui::PopStyleColor();
         ImGui::PopStyleVar();
 
-        showNormal();
+        showVertexArrow();
     }
 
     // Stats
@@ -298,7 +364,37 @@ void Gui::drawMenuWindow(igl::opengl::glfw::imgui::ImGuiMenu &menu) {
         drawSimulationStats();
         ImGui::PopItemWidth();
         ImGui::End();
-        ImGui::SetWindowFocus("Viewer");
+    }
+}
+
+inline std::string getFilename(int total_numObj, int obj, int total_steps,
+                               int step) {
+    std::stringstream ss;
+    ss << "_object" << std::setw(std::log10(total_numObj)) << std::setfill('0')
+       << obj << "_" << std::setw(std::log10(total_steps)) << step << ".obj";
+    return ss.str();
+}
+
+void Gui::exportRecording() {
+    std::string path = igl::file_dialog_save();
+    size_t finddot = path.find_last_of(".");
+    path = path.substr(0, finddot);
+    std::cout << "Exporting Recording to " << path << "_objectxxx_xxx.obj"
+              << std::endl;
+    auto rec = p_simulator->getRecords();
+    int steps = rec[0].size();
+    for (size_t i = 0; i < rec.size(); i++) {
+        int j = 0;
+        while (rec[i].size() > 0) {
+            std::string filename =
+                path + getFilename(rec.size(), i, steps, j++);
+            auto p = rec[i].front();
+            rec[i].pop();
+            bool succ = igl::writeOBJ(filename, p.first, p.second);
+            if (!succ) {
+                std::cerr << "Failed to write recording" << std::endl;
+            }
+        }
     }
 }
 
@@ -306,7 +402,9 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
                    igl::opengl::glfw::imgui::ImGuiMenu &menu) {
     if (ImGui::CollapsingHeader("Simulation Control",
                                 ImGuiTreeNodeFlags_DefaultOpen)) {
-        if (ImGui::Button("Run/Pause Simulation", ImVec2(-1, 0))) {
+        if (ImGui::Button(
+                p_simulator->isPaused() ? "Run Simulation" : "Pause Simulation",
+                ImVec2(-1, 0))) {
             toggleSimulation();
         }
         if (ImGui::Button("Reset Simulation", ImVec2(-1, 0))) {
@@ -315,6 +413,12 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
         if (ImGui::Button("Clear Screen", ImVec2(-1, 0))) {
             resetSimulation();
             clearScreen();
+        }
+        if (ImGui::SliderInt("Steps/Second", &m_simSpeed, 1, 240)) {
+            p_simulator->setSimulationSpeed(m_simSpeed);
+        }
+        if (ImGui::InputInt("Max Steps", &m_maxSteps, -1, -1)) {
+            p_simulator->setMaxSteps(m_maxSteps);
         }
     }
     if (ImGui::CollapsingHeader("Overlays", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -348,6 +452,46 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
     if (ImGui::CollapsingHeader("Simulation Parameters",
                                 ImGuiTreeNodeFlags_DefaultOpen)) {
         drawSimulationParameterMenu();
+    }
+    if (ImGui::CollapsingHeader("Recording")) {
+        bool hasRecords = p_simulator->getRecords().size() > 0 &&
+                          p_simulator->getRecords()[0].size() > 0;
+        if (!hasRecords) {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+        }
+        if (ImGui::Button("Export Recording", ImVec2(-1, 0))) {
+            if (hasRecords) {
+                exportRecording();
+            }
+        }
+        if (!hasRecords) {
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+        }
+        if (ImGui::InputInt("Steps in Recording to keep", &m_numRecords, 0,
+                            0)) {
+            p_simulator->setNumRecords(m_numRecords);
+        }
+        bool isRecording = p_simulator->isRecording();
+        ImGui::PushStyleColor(ImGuiCol_Button,
+                              isRecording ? ImVec4(0.98f, 0.26f, 0.26f, 0.40f)
+                                          : ImVec4(0.26f, 0.98f, 0.40f, 0.40f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              isRecording ? ImVec4(0.98f, 0.26f, 0.26f, 1.0f)
+                                          : ImVec4(0.26f, 0.98f, 0.40f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                              isRecording ? ImVec4(0.98f, 0.26f, 0.00f, 0.9f)
+                                          : ImVec4(0.00f, 0.98f, 0.40f, 0.9f));
+        if (ImGui::Button(isRecording ? "Stop Recording" : "Start Recording",
+                          ImVec2(-1, 0))) {
+            p_simulator->setRecording(!isRecording);
+        }
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
     }
     return false;
 }

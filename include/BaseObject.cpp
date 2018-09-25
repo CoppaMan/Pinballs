@@ -52,6 +52,8 @@ void BaseObject::setScale(double s) { m_scale = s; }
 
 void BaseObject::setID(int id) { m_id = id; }
 
+void BaseObject::setType(ObjType t) { m_type = t; }
+
 void BaseObject::setPosition(const Eigen::Vector3d& p) { m_position = p; }
 
 void BaseObject::setRotation(const Eigen::Quaterniond& q) {
@@ -64,12 +66,27 @@ void BaseObject::setRotation(const Eigen::Matrix3d& R) {
     m_quat = R;
 }
 
-double BaseObject::getScale() { return m_scale; }
+double BaseObject::getScale() const { return m_scale; }
 
-int BaseObject::getID() { return m_id; }
+int BaseObject::getID() const { return m_id; }
 
-Eigen::Vector3d BaseObject::getPosition() { return m_position; }
+ObjType BaseObject::getType() const { return m_type; }
 
-Eigen::Quaterniond BaseObject::getRotation() { return m_quat; }
+Eigen::Vector3d BaseObject::getPosition() const { return m_position; }
 
-Eigen::Matrix3d BaseObject::getRotationMatrix() { return m_rot; }
+Eigen::Quaterniond BaseObject::getRotation() const { return m_quat; }
+
+Eigen::Matrix3d BaseObject::getRotationMatrix() const { return m_rot; }
+
+Eigen::Vector3d BaseObject::getVertexPosition(int vertexIndex) const {
+    return m_mesh.V.row(vertexIndex) * m_scale *
+               getRotationMatrix().transpose() +
+           getPosition().transpose();
+}
+
+void BaseObject::getMesh(Eigen::MatrixXd& V, Eigen::MatrixXi& F) const {
+    // get mesh after rotation and translation
+    V = (m_mesh.V * m_scale * getRotationMatrix().transpose()).rowwise() +
+        getPosition().transpose();
+    F = m_mesh.F;
+}

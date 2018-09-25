@@ -2,14 +2,14 @@
 
 ## News and Changes
 
-<!-- 20.02.2018 17:30 - Added Exercise 1. -->
+25.09.2018 - Added Exercise 1. Please update your forked repository first.
 
-Follow the instructions to update your private repository.
+19.09.2018 - Follow the instructions to update your private repository.
 
 ## Exercise Overview
 
-Not available yet.
-<!-- [Exercise 1: Time Integration](1_canonball/README.md) (Due date: 09.03.2018 09:00)   -->
+<!-- Not available yet. -->
+[Exercise 1: Time Integration](ex1.pdf) (Due date: 02.09.2018 23:59)
 
 ## Installation
 

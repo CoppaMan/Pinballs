@@ -9,7 +9,7 @@
 class RigidObject : public BaseObject {
    public:
     RigidObject() {}
-    RigidObject(const std::string& mesh_path);
+    RigidObject(const std::string& mesh_path, const ObjType t = ObjType::DYNAMIC);
 
     void applyForceToCOM(const Eigen::Vector3d& f);
     /*
@@ -19,6 +19,7 @@ class RigidObject : public BaseObject {
     void applyTorque(const Eigen::Vector3d& t);
 
 #pragma region GettersAndSetters
+    virtual void setType(ObjType t);
     void setMass(double m);
     void setInertia(const Eigen::Matrix3d& I);
     void setLinearMomentum(const Eigen::Vector3d& p);
@@ -29,18 +30,18 @@ class RigidObject : public BaseObject {
     void resetForce();
     void resetTorque();
 
-    double getMass();
-    double getMassInv();
-    Eigen::Matrix3d getInertia();
-    Eigen::Matrix3d getInertiaInv();
-    Eigen::Matrix3d getInertiaInvWorld();
-    Eigen::Vector3d getLinearMomentum();
-    Eigen::Vector3d getAngularMomentum();
-    Eigen::Vector3d getLinearVelocity();
-    Eigen::Vector3d getAngularVelocity();
-    Eigen::Vector3d getForce();
-    Eigen::Vector3d getTorque();
-    void getMesh(Eigen::MatrixXd& V, Eigen::MatrixXi& F);
+    double getMass() const;
+    double getMassInv() const;
+    Eigen::Matrix3d getInertia() const;
+    Eigen::Matrix3d getInertiaInv() const;
+    Eigen::Matrix3d getInertiaInvWorld() const;
+    Eigen::Vector3d getLinearMomentum() const;
+    Eigen::Vector3d getAngularMomentum() const;
+    Eigen::Vector3d getLinearVelocity() const;
+    Eigen::Vector3d getVelocity(const Eigen::Vector3d& point) const;
+    Eigen::Vector3d getAngularVelocity() const;
+    Eigen::Vector3d getForce() const;
+    Eigen::Vector3d getTorque() const;
 #pragma endregion GettersAndSetters
 
    protected:
