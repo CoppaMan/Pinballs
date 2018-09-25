@@ -80,7 +80,7 @@ class CannonBallSim : public Simulation {
      */
     void updateVars() {
         Eigen::Vector3d momentum;
-        momentum << std::sin(m_angle), std::cos(m_angle), 0;
+        momentum << std::cos(m_angle), std::sin(m_angle), 0;
         momentum *= m_force;
         p_ball->setLinearVelocity(momentum / p_ball->getMass());
     }
