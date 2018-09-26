@@ -27,6 +27,28 @@ sudo port install cmake.
 On Windows you can download it from:
 [https://cmake.org/download/](https://cmake.org/download/)
 
+### Note for linux users
+
+Many linux distributions do not include `gcc` and the basic development tools in their default installation. On Ubuntu, you need to install the following packages:
+
+```
+sudo apt-get install build-essential
+sudo apt-get install libx11-dev
+sudo apt-get install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
+sudo apt-get install libxrandr-dev
+sudo apt-get install libxi-dev
+sudo apt-get install libxmu-dev
+sudo apt-get install libblas-dev
+sudo apt-get install libxinerama-dev
+sudo apt-get install libxcursor-dev
+```
+
+If you are using linux with a virtual machine on Windows, it is recommended to use Visual Studio instead.
+
+### Note for Windows users
+
+`libigl` supports the Microsoft Visual Studio 2015 compiler and later, in 64bit mode. You can download them for free from [ETH-Microsoft webstore](https://e5.onthehub.com/WebStore/ProductsByMajorVersionList.aspx?cmi_cs=1&cmi_mnuMain=bdba23cf-e05e-e011-971f-0030487d8897&ws=5664fddb-836f-e011-971f-0030487d8897&vsro=8).
+
 
 ### Cloning the Exercise Repository
 Before you are able to clone your private exercise repository, you need to have an active [Gitlabvis](https://gitlab.vis.ethz.ch/) account. Then you can [fork](https://docs.gitlab.com/ee/gitlab-basics/fork-project.html) this project to create your own private online repository.
