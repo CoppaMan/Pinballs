@@ -74,3 +74,16 @@ make && ./0_dummy
 Or use your favorite IDE.
 
 To update your forked repository, check this page: [how-do-i-update-a-github-forked-repository](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository)
+
+Basically, you are required to add our repository as a remote to your own one (just once):
+```
+git remote add upstream https://gitlab.vis.ethz.ch/kimby/PBS18-Exercises.git
+```
+Then, fetch updates from it (should be done again for new updates):
+```
+git fetch upstream
+```
+Lastly, move to your `master` branch and merge updates:
+```
+git merge upstream/master
+```
