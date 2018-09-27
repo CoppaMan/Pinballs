@@ -69,7 +69,7 @@ On Windows use the CMAKE gui with the buttons Configure and Generate.
 
 Compile and run the executable, e.g.:
 ```
-make && ./0_dummy
+make && ./0_dummy/0_dummy
 ```
 Or use your favorite IDE.
 
