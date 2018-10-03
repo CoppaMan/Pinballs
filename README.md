@@ -81,7 +81,7 @@ To update your forked repository, check this page: [how-do-i-update-a-github-for
 
 Basically, you are required to add our repository as a remote to your own one:
 ```
-git remote add upstream https://gitlab.vis.ethz.ch/kimby/PBS18-Exercises.git
+git remote add upstream https://gitlab.vis.ethz.ch/cglphysics/PBS18-Exercises.git
 ```
 Then, fetch updates from it:
 ```
