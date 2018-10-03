@@ -92,4 +92,5 @@ Lastly, move to your `master` branch and merge updates into yours:
 git checkout master
 git merge upstream/master
 ```
-Run the first line only once for adding, and the following steps should be done again for new updates.
+Run the first line only once for adding, and the following steps (cmake as well!) should be done again for new updates.
+
