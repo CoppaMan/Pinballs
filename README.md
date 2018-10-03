@@ -2,7 +2,7 @@
 
 ## News and Changes
 
-03.10.2018 - Added Exercise 2.
+03.10.2018 (17:35) - Added Exercise 2 with the task description.
 
 25.09.2018 - Added Exercise 1. Please update your forked repository first.
 
@@ -11,9 +11,8 @@
 ## Exercise Overview
 
 <!-- Not available yet. -->
-[Exercise 1: Time Integration](ex1.pdf) (Due date: 02.09.2018 23:59)
-<!-- [Exercise 2: Rigid Body Rotation](ex2.pdf) (Due date: 09.10.2018 23:59) -->
-Exercise 2: Rigid Body Rotation (will be uploaded soon) (Due date: 09.10.2018 23:59) -->
+[Exercise 1: Time Integration](ex1.pdf)
+[Exercise 2: Rigid Body Rotation](ex2.pdf)
 
 ## Installation
 
@@ -71,11 +70,11 @@ cmake ..
 ```
 On Windows use the CMAKE gui with the buttons Configure and Generate.
 
-Compile and run the executable, e.g.:
+Compile and run the executable, e.g. Ubuntu:
 ```
 make && ./0_dummy/0_dummy
 ```
-Or use your favorite IDE.
+Or use your favorite IDE. In case of Visual Studio, you need to open ```build/PBS.sln``` file.
 
 To update your forked repository, check this page: [how-do-i-update-a-github-forked-repository](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository)
 
