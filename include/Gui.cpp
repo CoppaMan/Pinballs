@@ -24,14 +24,13 @@ void Gui::start() {
   
   Shortcuts:
   [drag] Rotate scene                 |  [space] Start/pause simulation
-  I,i    Toggle invert normals        |  R,r     Reset simulation
-  L,l    Toggle wireframe             |  C,c     Clear screen
-  T,t    Toggle filled faces          |  -       Toggle fast forward
-  ;      Toggle vertex labels
+  I,i    Toggle invert normals        |  A,a     Single step
+  L,l    Toggle wireframe             |  R,r     Reset simulation
+  T,t    Toggle filled faces          |  C,c     Clear screen
+  ;      Toggle vertex labels         |  -       Toggle fast forward
   :      Toggle face labels)");
     std::cout << usage << std::endl;
     // setting up viewer
-    m_viewer.data().set_face_based(true);
     m_viewer.data().show_lines = false;
     m_viewer.data().point_size = 2.0f;
     m_viewer.core.is_animating = true;
@@ -179,6 +178,13 @@ void Gui::toggleSimulation() {
     }
 }
 
+void Gui::singleStep() {
+    if (!p_simulator->hasStarted()) {
+        updateSimulationParameters();
+    }
+    p_simulator->run(true);
+}
+
 void Gui::clearScreen() {
     m_request_clear = true;
     clearSimulation();
@@ -223,6 +229,9 @@ bool Gui::keyCallback(igl::opengl::glfw::Viewer &viewer, unsigned int key,
         case 'R':
             resetSimulation();
             return true;
+        case 'a':
+        case 'A':
+            singleStep();
         case 'c':
         case 'C':
             clearScreen();
@@ -406,6 +415,9 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
                 p_simulator->isPaused() ? "Run Simulation" : "Pause Simulation",
                 ImVec2(-1, 0))) {
             toggleSimulation();
+        }
+        if (ImGui::Button("Single Step", ImVec2(-1, 0))) {
+            singleStep();
         }
         if (ImGui::Button("Reset Simulation", ImVec2(-1, 0))) {
             resetSimulation();

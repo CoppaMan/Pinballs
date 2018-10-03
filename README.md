@@ -2,6 +2,8 @@
 
 ## News and Changes
 
+03.10.2018 - Added Exercise 2.
+
 25.09.2018 - Added Exercise 1. Please update your forked repository first.
 
 19.09.2018 - Follow the instructions to update your private repository.
@@ -10,6 +12,8 @@
 
 <!-- Not available yet. -->
 [Exercise 1: Time Integration](ex1.pdf) (Due date: 02.09.2018 23:59)
+<!-- [Exercise 2: Rigid Body Rotation](ex2.pdf) (Due date: 09.10.2018 23:59) -->
+Exercise 2: Rigid Body Rotation (will be uploaded soon) (Due date: 09.10.2018 23:59) -->
 
 ## Installation
 

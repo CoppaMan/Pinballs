@@ -91,6 +91,8 @@ class Gui {
 
     void toggleSimulation();
 
+    void singleStep();
+
     void resetSimulation();
 
     void exportRecording();

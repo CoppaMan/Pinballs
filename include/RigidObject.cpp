@@ -37,6 +37,21 @@ void RigidObject::applyTorque(const Eigen::Vector3d& t) {
     m_torque += t;
 }
 
+void RigidObject::printDebug(const std::string message) const {
+    std::cout << std::endl;
+    if (message.size() > 0) {
+        std::cout << message << std::endl;
+    }
+    std::cout << "position:         " << m_position.transpose() << std::endl;
+    std::cout << "rotation:         " << std::endl << m_rot << std::endl;
+    std::cout << "linear velocity:  " << m_v.transpose() << std::endl;
+    std::cout << "angular velocity: " << m_w.transpose() << std::endl;
+    std::cout << "force:            " << m_force.transpose() << std::endl;
+    std::cout << "torque:           " << m_torque.transpose() << std::endl;
+    std::cout << "mass (inv):           " << m_mass << " (" << m_massInv << ")"
+              << std::endl;
+}
+
 #pragma region GettersAndSetters
 void RigidObject::setType(ObjType t) {
     m_type = t;
@@ -59,7 +74,7 @@ void RigidObject::setMass(double m) {
 
 void RigidObject::setInertia(const Eigen::Matrix3d& I) {
     if (m_type != ObjType::DYNAMIC) return;
-    
+
     m_inertia = I;
     m_inertiaInv = m_inertia.inverse();
 }
@@ -67,19 +82,25 @@ void RigidObject::setInertia(const Eigen::Matrix3d& I) {
 void RigidObject::setLinearMomentum(const Eigen::Vector3d& p) {
     if (m_type != ObjType::DYNAMIC) return;
 
-    m_p = p;
+    m_v = m_massInv * p;
 }
 
 void RigidObject::setAngularMomentum(const Eigen::Vector3d& l) {
     if (m_type != ObjType::DYNAMIC) return;
 
-    m_l = l;
+    m_w = getInertiaInvWorld() * l;
 }
 
 void RigidObject::setLinearVelocity(const Eigen::Vector3d& v) {
     if (m_type != ObjType::DYNAMIC) return;
 
-    m_p = v * m_mass;
+    m_v = v;
+}
+
+void RigidObject::setAngularVelocity(const Eigen::Vector3d& w) {
+    if (m_type != ObjType::DYNAMIC) return;
+
+    m_w = w;
 }
 
 void RigidObject::setForce(const Eigen::Vector3d& f) {
@@ -107,15 +128,19 @@ Eigen::Matrix3d RigidObject::getInertia() const { return m_inertia; }
 Eigen::Matrix3d RigidObject::getInertiaInv() const { return m_inertiaInv; }
 
 Eigen::Matrix3d RigidObject::getInertiaInvWorld() const {
-    return m_rot * m_inertiaInv * m_rot.transpose();
+    return m_quat * m_inertiaInv * m_quat.inverse();
 }
 
-Eigen::Vector3d RigidObject::getLinearMomentum() const { return m_p; }
+Eigen::Matrix3d RigidObject::getInertiaWorld() const {
+    return m_quat * m_inertia * m_quat.inverse();
+}
 
-Eigen::Vector3d RigidObject::getAngularMomentum() const { return m_l; }
+Eigen::Vector3d RigidObject::getLinearMomentum() const { return m_v * m_mass; }
+
+Eigen::Vector3d RigidObject::getAngularMomentum() const { return  getInertiaWorld() * m_w; }
 
 Eigen::Vector3d RigidObject::getLinearVelocity() const {
-    return m_p * m_massInv;
+    return m_v;
 }
 
 Eigen::Vector3d RigidObject::getVelocity(const Eigen::Vector3d& point) const {
@@ -124,7 +149,7 @@ Eigen::Vector3d RigidObject::getVelocity(const Eigen::Vector3d& point) const {
 }
 
 Eigen::Vector3d RigidObject::getAngularVelocity() const {
-    return getInertiaInvWorld() * getAngularMomentum();
+    return m_w;
 }
 
 Eigen::Vector3d RigidObject::getForce() const { return m_force; }

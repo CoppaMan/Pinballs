@@ -1,7 +1,7 @@
 #include "CannonBallSim.h"
 
 /////////////////////////////////////
-///////////// PROBLEM 1 /////////////
+//////// EX 1 - PROBLEM 1 ///////////
 /////////////////////////////////////
 bool CannonBallSim::advance() {
     // perform time integration with different integrators

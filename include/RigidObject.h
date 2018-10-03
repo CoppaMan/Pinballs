@@ -17,6 +17,7 @@ class RigidObject : public BaseObject {
      */
     void applyForce(const Eigen::Vector3d& f, const Eigen::Vector3d& p);
     void applyTorque(const Eigen::Vector3d& t);
+    void printDebug(const std::string message = "") const;
 
 #pragma region GettersAndSetters
     virtual void setType(ObjType t);
@@ -25,6 +26,7 @@ class RigidObject : public BaseObject {
     void setLinearMomentum(const Eigen::Vector3d& p);
     void setAngularMomentum(const Eigen::Vector3d& l);
     void setLinearVelocity(const Eigen::Vector3d& v);
+    void setAngularVelocity(const Eigen::Vector3d& w);
     void setForce(const Eigen::Vector3d& f);
     void setTorque(const Eigen::Vector3d& t);
     void resetForce();
@@ -35,6 +37,7 @@ class RigidObject : public BaseObject {
     Eigen::Matrix3d getInertia() const;
     Eigen::Matrix3d getInertiaInv() const;
     Eigen::Matrix3d getInertiaInvWorld() const;
+    Eigen::Matrix3d getInertiaWorld() const;
     Eigen::Vector3d getLinearMomentum() const;
     Eigen::Vector3d getAngularMomentum() const;
     Eigen::Vector3d getLinearVelocity() const;
@@ -53,8 +56,8 @@ class RigidObject : public BaseObject {
     Eigen::Matrix3d m_inertia;     // Intertial Tensor (initially set to cube)
     Eigen::Matrix3d m_inertiaInv;  // Inverse
 
-    Eigen::Vector3d m_p;  // Linear momentum
-    Eigen::Vector3d m_l;  // Angular momentum
+    Eigen::Vector3d m_v;  // Linear velocity
+    Eigen::Vector3d m_w;  // Angular velocity
 
     Eigen::Vector3d m_force;   // Force on body
     Eigen::Vector3d m_torque;  // Torque on body

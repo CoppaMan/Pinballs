@@ -10,6 +10,7 @@
 struct Mesh {
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
+    Eigen::MatrixXd C;
 
     // Per face attributes
     Eigen::MatrixXd F_normals;  // One normal per face
@@ -31,6 +32,7 @@ class BaseObject {
     void findAndLoadMesh(const std::string& file);
 
     void reset();
+    void recomputeCOM();
 
     void setScale(double s);
     void setID(int id);
@@ -38,6 +40,7 @@ class BaseObject {
     void setPosition(const Eigen::Vector3d& p);
     void setRotation(const Eigen::Quaterniond& q);
     void setRotation(const Eigen::Matrix3d& R);
+    void setColors(const Eigen::MatrixXd& C);
 
     double getScale() const;
     int getID() const;
@@ -47,6 +50,7 @@ class BaseObject {
     Eigen::Matrix3d getRotationMatrix() const;
     Eigen::Vector3d getVertexPosition(int vertexIndex) const;
     void getMesh(Eigen::MatrixXd& V, Eigen::MatrixXi& F) const;
+    void getColors(Eigen::MatrixXd& C) const;
 
    protected:
     /*

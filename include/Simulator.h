@@ -26,7 +26,8 @@ class Simulator {
           m_please_die(false),
           m_running(false),
           m_started(false),
-          m_recording(false) {}
+          m_recording(false),
+          m_single_iteration(false) {}
 
     virtual ~Simulator() {
         killSimulatorThread();
@@ -37,16 +38,29 @@ class Simulator {
     /*
      * Runs the simulation, if it has been paused (or never started).
      */
-    void run() {
+    void run(bool single = false) {
         m_status_mutex.lock();
         if (!m_started) {
             p_simulation->reset();
             m_started = true;
-            std::cout << "Start simulation" << std::endl;
-        } else {
-            std::cout << "Resume simulation" << std::endl;
+            if (single) {
+                std::cout << "Single step" << std::endl;
+            } else {
+                std::cout << "Start simulation" << std::endl;
+            }
+        } else if (m_please_pause){
+            if (single) {
+                std::cout << "Single step" << std::endl;
+            } else {
+                std::cout << "Resume simulation" << std::endl;
+            }
         }
-        m_please_pause = false;
+        if (m_please_pause) {
+            m_single_iteration = single;
+        }
+        if (!single) {
+            m_please_pause = false;
+        }
         m_status_mutex.unlock();
     }
 
@@ -150,6 +164,7 @@ class Simulator {
             }
         }
     }
+
     void runSimThread() {
         m_status_mutex.lock();
         m_running = true;
@@ -159,9 +174,10 @@ class Simulator {
         while (!done) {
             m_status_mutex.lock();
             bool pausenow = m_please_pause;
+            bool single = m_single_iteration;
             m_status_mutex.unlock();
 
-            if (pausenow) {
+            if (pausenow && !single) {
                 // don't use to much CPU time
                 std::this_thread::sleep_for(milliseconds(10));
             } else {
@@ -198,6 +214,7 @@ class Simulator {
             }
 
             m_status_mutex.lock();
+            if (single) m_single_iteration = false;
             if (m_please_die) done = true;
             m_status_mutex.unlock();
         }
@@ -225,6 +242,7 @@ class Simulator {
     bool m_please_die;
     bool m_running;
     bool m_started;
+    bool m_single_iteration;
     int m_maxTimePerStep;
     int m_maxSteps = -1;  // max number of steps to perform, -1 for infinite
 

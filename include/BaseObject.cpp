@@ -30,6 +30,8 @@ bool BaseObject::loadMesh(const std::string& path) {
             igl::per_vertex_normals(m_mesh.V, m_mesh.F, m_mesh.V_normals);
         }
     }
+    m_mesh.C = Eigen::MatrixXd(1,3);
+    m_mesh.C << 255.0 / 255.0, 228.0 / 255.0, 58.0 / 255.0;
     return succ;
 }
 
@@ -46,6 +48,11 @@ void BaseObject::reset() {
     setPosition(Eigen::Vector3d::Zero());
     setRotation(Eigen::Matrix3d::Identity());
     resetMembers();
+}
+
+void BaseObject::recomputeCOM(){
+    Eigen::Vector3d COM = m_mesh.V.colwise().mean();
+    m_mesh.V = m_mesh.V.rowwise() - COM.transpose();
 }
 
 void BaseObject::setScale(double s) { m_scale = s; }
@@ -65,6 +72,8 @@ void BaseObject::setRotation(const Eigen::Matrix3d& R) {
     m_rot = R;
     m_quat = R;
 }
+
+void BaseObject::setColors(const Eigen::MatrixXd& C) { m_mesh.C = C; }
 
 double BaseObject::getScale() const { return m_scale; }
 
@@ -90,3 +99,5 @@ void BaseObject::getMesh(Eigen::MatrixXd& V, Eigen::MatrixXi& F) const {
         getPosition().transpose();
     F = m_mesh.F;
 }
+
+void BaseObject::getColors(Eigen::MatrixXd& C) const { C = m_mesh.C; }
