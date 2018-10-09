@@ -61,6 +61,7 @@ class RigidObject : public BaseObject {
 
     Eigen::Vector3d m_force;   // Force on body
     Eigen::Vector3d m_torque;  // Torque on body
+
 };
 
 #endif

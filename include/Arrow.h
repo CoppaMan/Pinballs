@@ -34,4 +34,5 @@ class Arrow {
     std::vector<Eigen::RowVector3d> head;
 
     Eigen::RowVector3d color;
+    size_t id;
 };

@@ -77,21 +77,26 @@ void Gui::resetSimulation() {
 #pragma region ArrowInterface
 int Gui::addArrow(const Eigen::Vector3d &start, const Eigen::Vector3d &end) {
     m_arrows.push_back(Arrow(start, end));
-    return m_arrows.size() - 1;
+    m_arrows.back().id = m_numArrows++;
+    return m_arrows.back().id;
 }
 
 int Gui::addArrow(const Eigen::Vector3d &start, const Eigen::Vector3d &end,
                   const Eigen::Vector3d &color) {
     m_arrows.push_back(Arrow(start, end, color));
-    return m_arrows.size() - 1;
+    m_arrows.back().id = m_numArrows++;
+    return m_arrows.back().id;
 }
 
 void Gui::removeArrow(size_t index) {
-    assert((index >= 0 && index < m_arrows.size()) &&
-           "index should be in bounds");
-    assert(m_arrows.size() > 0);
-    m_arrows.erase(m_arrows.begin() + index);
-    m_numArrows = m_arrows.size();
+    bool found = false;
+    for (size_t i = 0; i < m_arrows.size(); i++) {
+        if (m_arrows[i].id == index) {
+            found = true;
+            m_arrows.erase(m_arrows.begin() + i);
+        }
+    }
+    assert(found && "unable to find index");
 }
 
 void Gui::drawArrow(const Arrow &arrow) {
@@ -423,7 +428,6 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
             resetSimulation();
         }
         if (ImGui::Button("Clear Screen", ImVec2(-1, 0))) {
-            resetSimulation();
             clearScreen();
         }
         if (ImGui::SliderInt("Steps/Second", &m_simSpeed, 1, 240)) {
@@ -509,17 +513,17 @@ bool Gui::drawMenu(igl::opengl::glfw::Viewer &viewer,
 }
 
 void Gui::showAxes(bool show_axes) {
-    if (show_axes && m_axesIndex < 0) {
+    if (show_axes && m_axesID < 0) {
         Eigen::RowVector3d origin = Eigen::Vector3d::Zero();
-        m_axesIndex = addArrow(origin, Eigen::Vector3d(1, 0, 0),
-                               Eigen::Vector3d(1, 0, 0));
+        m_axesID = addArrow(origin, Eigen::Vector3d(1, 0, 0),
+                            Eigen::Vector3d(1, 0, 0));
         addArrow(origin, Eigen::Vector3d(0, 1, 0), Eigen::Vector3d(0, 1, 0));
         addArrow(origin, Eigen::Vector3d(0, 0, 1), Eigen::Vector3d(0, 0, 1));
     }
-    if (!show_axes && m_axesIndex >= 0) {
-        removeArrow(m_axesIndex);
-        removeArrow(m_axesIndex);
-        removeArrow(m_axesIndex);
-        m_axesIndex = -1;
+    if (!show_axes && m_axesID >= 0) {
+        removeArrow(m_axesID);
+        removeArrow(m_axesID + 1);
+        removeArrow(m_axesID + 2);
+        m_axesID = -1;
     }
 }

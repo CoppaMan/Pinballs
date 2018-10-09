@@ -130,16 +130,16 @@ class Gui {
     int m_clickedArrow = -1;      // index of arrow of clicked vertex
     std::vector<Arrow> m_arrows;  // data structure to store all the arrows
                                   // to be rendered
-    int m_numArrows = -1;         // number of arrows in m_arrows
+    unsigned long m_numArrows = 0;         // increasing counter for arrows
 
-    int m_axesIndex = -1;  // (lowest) index of the 3 base axes
+    int m_axesID = -1;  // (lowest) id of the 3 base axes
     bool m_showAxes = true;
 
     bool m_showStats = true;
     double m_timerAverage = 0;  // running average of execution time of
                                 // one iteration of the simulation
     int m_maxSteps = -1;
-    
+
     int m_numRecords = 100;  // number of records to keep
 };
 
