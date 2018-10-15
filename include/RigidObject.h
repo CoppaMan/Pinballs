@@ -9,7 +9,8 @@
 class RigidObject : public BaseObject {
    public:
     RigidObject() {}
-    RigidObject(const std::string& mesh_path, const ObjType t = ObjType::DYNAMIC);
+    RigidObject(const std::string& mesh_path,
+                const ObjType t = ObjType::DYNAMIC);
 
     void applyForceToCOM(const Eigen::Vector3d& f);
     /*
@@ -17,7 +18,7 @@ class RigidObject : public BaseObject {
      */
     void applyForce(const Eigen::Vector3d& f, const Eigen::Vector3d& p);
     void applyTorque(const Eigen::Vector3d& t);
-    void printDebug(const std::string message = "") const;
+    void printDebug(const std::string& message = "") const;
 
 #pragma region GettersAndSetters
     virtual void setType(ObjType t);
@@ -61,7 +62,6 @@ class RigidObject : public BaseObject {
 
     Eigen::Vector3d m_force;   // Force on body
     Eigen::Vector3d m_torque;  // Torque on body
-
 };
 
 #endif

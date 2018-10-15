@@ -30,9 +30,14 @@ bool BaseObject::loadMesh(const std::string& path) {
             igl::per_vertex_normals(m_mesh.V, m_mesh.F, m_mesh.V_normals);
         }
     }
-    m_mesh.C = Eigen::MatrixXd(1,3);
+    m_mesh.C = Eigen::MatrixXd(1, 3);
     m_mesh.C << 255.0 / 255.0, 228.0 / 255.0, 58.0 / 255.0;
     return succ;
+}
+
+void BaseObject::setMesh(const Eigen::MatrixXd& V, const Eigen::MatrixXi& F) {
+    m_mesh.V = V;
+    m_mesh.F = F;
 }
 
 void BaseObject::findAndLoadMesh(const std::string& file) {
@@ -50,7 +55,7 @@ void BaseObject::reset() {
     resetMembers();
 }
 
-void BaseObject::recomputeCOM(){
+void BaseObject::recomputeCOM() {
     Eigen::Vector3d COM = m_mesh.V.colwise().mean();
     m_mesh.V = m_mesh.V.rowwise() - COM.transpose();
 }

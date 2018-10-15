@@ -37,7 +37,7 @@ void RigidObject::applyTorque(const Eigen::Vector3d& t) {
     m_torque += t;
 }
 
-void RigidObject::printDebug(const std::string message) const {
+void RigidObject::printDebug(const std::string& message) const {
     std::cout << std::endl;
     if (message.size() > 0) {
         std::cout << message << std::endl;
@@ -137,20 +137,18 @@ Eigen::Matrix3d RigidObject::getInertiaWorld() const {
 
 Eigen::Vector3d RigidObject::getLinearMomentum() const { return m_v * m_mass; }
 
-Eigen::Vector3d RigidObject::getAngularMomentum() const { return  getInertiaWorld() * m_w; }
-
-Eigen::Vector3d RigidObject::getLinearVelocity() const {
-    return m_v;
+Eigen::Vector3d RigidObject::getAngularMomentum() const {
+    return getInertiaWorld() * m_w;
 }
+
+Eigen::Vector3d RigidObject::getLinearVelocity() const { return m_v; }
 
 Eigen::Vector3d RigidObject::getVelocity(const Eigen::Vector3d& point) const {
     return getLinearVelocity() +
            getAngularVelocity().cross(point - getPosition());
 }
 
-Eigen::Vector3d RigidObject::getAngularVelocity() const {
-    return m_w;
-}
+Eigen::Vector3d RigidObject::getAngularVelocity() const { return m_w; }
 
 Eigen::Vector3d RigidObject::getForce() const { return m_force; }
 

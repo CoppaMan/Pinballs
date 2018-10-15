@@ -1,9 +1,11 @@
 
 cmake_minimum_required(VERSION 3.1)
-project(PBS)
+project(6_mss)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
+set(CMAKE_CXX_FLAGS "-Wall")
 
+# libigl
 option(LIBIGL_USE_STATIC_LIBRARY "Use libigl as static library" OFF)
 option(LIBIGL_WITH_ANTTWEAKBAR       "Use AntTweakBar"    OFF)
 option(LIBIGL_WITH_CGAL              "Use CGAL"           OFF)
@@ -27,10 +29,14 @@ if (NOT LIBIGL_FOUND)
     find_package(LIBIGL REQUIRED QUIET)
 endif()
 
-add_subdirectory(0_dummy)
-add_subdirectory(1_cannonball)
-add_subdirectory(2_spring)
-add_subdirectory(3_spinning)
-add_subdirectory(4_gyro)
-add_subdirectory(5_collision)
-add_subdirectory(6_mss)
+# Add your project files
+file(GLOB SRCFILES *.cpp)
+file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/../include/*.cpp)
+file(GLOB HFILES *.h)
+file(GLOB H_FILES ${PROJECT_SOURCE_DIR}/../include/*.h)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
+add_definitions(-DIGL_VIEWER_VIEWER_QUIET)
+add_executable(${PROJECT_NAME} ${SRCFILES} ${SRC_FILES} ${HFILES} ${H_FILES})
+target_link_libraries(${PROJECT_NAME} igl::core igl::opengl_glfw igl::opengl_glfw_imgui)

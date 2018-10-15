@@ -2,6 +2,8 @@
 
 ## News and Changes
 
+15.10.2018 - Added Exercise 4.
+
 10.10.2018 - Added Exercise 3.
 
 03.10.2018 (17:35) - Added Exercise 2 with the task description.
@@ -18,6 +20,8 @@
 [Exercise 2: Rigid Body Rotation](ex2.pdf)
 
 [Exercise 3: Collision Handling](ex3.pdf)
+
+[Exercise 4: Mass-Spring System](ex4.pdf)
 
 ## Installation
 
