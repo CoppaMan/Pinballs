@@ -2,6 +2,8 @@
 
 ## News and Changes
 
+23.10.2018 - Added Exercise 5. The framework for this exercise is different from previous one, so run one of _generateBuild*_ files in `7_fluid` directory according to your OS.
+
 15.10.2018 - Added Exercise 4.
 
 10.10.2018 - Added Exercise 3.
@@ -22,6 +24,8 @@
 [Exercise 3: Collision Handling](ex3.pdf)
 
 [Exercise 4: Mass-Spring System](ex4.pdf)
+
+[Exercise 5: Fluid Simulation](ex5.pdf)
 
 ## Installation
 
