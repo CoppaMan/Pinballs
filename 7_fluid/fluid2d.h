@@ -18,7 +18,7 @@
 #endif  
 
 // resolution of the simulation
-const int simulationResolution = 256;
+const int simulationResolution = 64;
 
 // global control defines
 #define OUTPATH "./output/"
