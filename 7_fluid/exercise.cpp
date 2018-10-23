@@ -156,9 +156,9 @@ void ExAdvectWithSemiLagrange(int _xRes, int _yRes, double _dt, Array2d &_xVeloc
 			double last_x_velocity = 0;
 			double last_y_velocity = 0;
 
-			// Find the last position of the particle (in grid coordinates)
-			double last_x = x - _dt * _xRes * last_x_velocity;
-			double last_y = y - _dt * _yRes * last_y_velocity;
+			// TODO: Find the last position of the particle (in grid coordinates)
+			double last_x = 0;
+			double last_y = 0;
 
 			// Make sure the coordinates are inside the boundaries
 			// Being conservative, one can say that the velocities are known between 1.5 and res-2.5
@@ -178,7 +178,7 @@ void ExAdvectWithSemiLagrange(int _xRes, int _yRes, double _dt, Array2d &_xVeloc
 			double x_weight = last_x - x_low;
 			double y_weight = last_y - y_low;
 
-			// Bilinear interpolation
+			// TODO: Bilinear interpolation
 			_yVelocityTemp(x, y) = 0;
 		}
 	}
