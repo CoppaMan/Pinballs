@@ -23,7 +23,7 @@ struct Mesh {
     Eigen::MatrixXi F_uv;  // optional faces for UVs
 };
 
-enum class ObjType { STATIC, DYNAMIC };
+enum class ObjType { STATIC, DYNAMIC, ROTATION_ONLY };
 
 class BaseObject {
    public:

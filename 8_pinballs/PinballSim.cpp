@@ -9,6 +9,15 @@ bool PinballSim::advance() {
     p_ball->applyForceToCOM(m_gravity);
 
     for (auto &o : m_objects) {
+        //Apply rotation to flippers
+        if(o.getType() == ObjType::ROTATION_ONLY) {
+            if(/*corresponding key presses*/0) {
+                o.setAngularMomentum(4*Eigen::Vector3d::UnitZ());
+            } else {
+                o.setAngularMomentum(-4*Eigen::Vector3d::UnitZ());
+            }
+        }
+
         // integrate velocities
         o.setLinearMomentum(o.getLinearMomentum() + m_dt * o.getMassInv() * o.getForce());
         o.setAngularMomentum(o.getAngularMomentum() + m_dt * o.getMassInv()  * o.getTorque());

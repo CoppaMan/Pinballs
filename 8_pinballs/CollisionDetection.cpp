@@ -216,12 +216,28 @@ void CollisionDetection::applyImpulse(double eps) {
         // vrel <= 0 -> bodies move towards each other
         // we have no friction so
 
+        switch (contact.a->getType()) {
+            case ObjType::DYNAMIC:
+                contact.a->setLinearMomentum(v_new_a);
+                contact.a->setAngularMomentum(w1);
+                break;
+            case ObjType::ROTATION_ONLY:
+                contact.a->setAngularMomentum(w1);
+                break;
+            case ObjType::STATIC:
+                break;
+        }
 
-        contact.a->setLinearMomentum(v_new_a);
-        contact.b->setLinearMomentum(v_new_b);
-
-        contact.a->setAngularMomentum(w1);
-        contact.b->setAngularMomentum(w2);
-
+        switch (contact.b->getType()) {
+            case ObjType::DYNAMIC:
+                contact.b->setLinearMomentum(v_new_a);
+                contact.b->setAngularMomentum(w1);
+                break;
+            case ObjType::ROTATION_ONLY:
+                contact.b->setAngularMomentum(w1);
+                break;
+            case ObjType::STATIC:
+                break;
+        }
     }
 }
