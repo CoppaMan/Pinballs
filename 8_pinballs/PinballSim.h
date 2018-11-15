@@ -15,6 +15,7 @@ public:
     // CONFIGS
     float m_dt = 1e-2;
     Eigen::Vector3d m_gravity;
+    long score = 0;
     //
 
 

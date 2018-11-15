@@ -154,4 +154,10 @@ Eigen::Vector3d RigidObject::getForce() const { return m_force; }
 
 Eigen::Vector3d RigidObject::getTorque() const { return m_torque; }
 
+void RigidObject::addEffect(Effect e) {
+    effects.push_back(e);
+}
+
+vector<Effect> RigidObject::getEffects() { return effects; }
+
 #pragma endregion GettersAndSetters

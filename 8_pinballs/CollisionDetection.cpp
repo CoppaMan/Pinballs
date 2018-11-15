@@ -216,6 +216,7 @@ void CollisionDetection::applyImpulse(double eps) {
         // vrel <= 0 -> bodies move towards each other
         // we have no friction so
 
+        //Different outcomes depending on object type
         switch (contact.a->getType()) {
             case ObjType::DYNAMIC:
                 contact.a->setLinearMomentum(v_new_a);
@@ -239,5 +240,10 @@ void CollisionDetection::applyImpulse(double eps) {
             case ObjType::STATIC:
                 break;
         }
+
+        //Apply effects stored in RigidObjects eg.
+        //play sound effect or increase score
+        for(auto&& e : contact.a->getEffects) e.apply();
+        for(auto&& e : contact.b->getEffects) e.apply();
     }
 }
