@@ -1,5 +1,7 @@
 #include "RigidObject.h"
 
+RigidObject::RigidObject() {}
+
 RigidObject::RigidObject(const std::string& mesh_file, const ObjType t) {
     findAndLoadMesh(mesh_file);
     setType(t);
@@ -158,6 +160,6 @@ void RigidObject::addEffect(Effect e) {
     effects.push_back(e);
 }
 
-vector<Effect> RigidObject::getEffects() { return effects; }
+std::vector<Effect> RigidObject::getEffects() { return effects; }
 
 #pragma endregion GettersAndSetters

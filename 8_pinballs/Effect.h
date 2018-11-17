@@ -1,11 +1,18 @@
-#include <PinballSim.h>
+#include <igl/edges.h>
+
+#ifndef Included_Effect
+#define Included_Effect
+
+// forward declr
+class PinballSim;
 
 class Effect {
     public:
-        Effect(PinballSim sim);
+        Effect(PinballSim *sim);
         virtual void apply();
 
     protected:
         PinballSim *ps;
-        RigidObject obj;
 };
+
+# endif // Included_Effect

@@ -2,14 +2,14 @@
 #define RIGIDOBJECT_H
 
 #include "BaseObject.h"
-#include "Effect.h"
+#include "../8_pinballs/Effect.h"
 
 /*
  * Base class representing a simple rigid object.
  */
 class RigidObject : public BaseObject {
    public:
-    RigidObject() {}
+    RigidObject();
     RigidObject(const std::string& mesh_path,
                 const ObjType t = ObjType::DYNAMIC);
 
@@ -22,7 +22,7 @@ class RigidObject : public BaseObject {
     void printDebug(const std::string& message = "") const;
 
     void addEffect(Effect e);
-    vector<Effect> getEffects();
+    std::vector<Effect> getEffects();
 
 #pragma region GettersAndSetters
     virtual void setType(ObjType t);
@@ -67,7 +67,7 @@ class RigidObject : public BaseObject {
     Eigen::Vector3d m_force;   // Force on body
     Eigen::Vector3d m_torque;  // Torque on body
 
-    vector<Effect> effects; // Triggers certain effects during different parts of the simulation
+    std::vector<Effect> effects; // Triggers certain effects during different parts of the simulation
 };
 
 #endif

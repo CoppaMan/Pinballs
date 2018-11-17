@@ -1,5 +1,7 @@
-#include <Effect.h>
+#include "Effect.h"
 
-Effect::Effect(PinballSim sim) {
-    ps = &sim;
+Effect::Effect(PinballSim* sim) {
+    ps = sim;
 }
+
+void Effect::apply() {}
