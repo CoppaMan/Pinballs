@@ -176,7 +176,7 @@ void CollisionDetection::applyImpulse(double eps) {
     for (auto contact : m_contacts) {
         Eigen::Vector3d va = contact.a->getVelocity(contact.p);
         Eigen::Vector3d vb = contact.b->getVelocity(contact.p);
-        Eigen::Vector3d n = -contact.n;
+        Eigen::Vector3d n = contact.n;
         Eigen::Vector3d ra = contact.p - contact.a->getPosition();
         Eigen::Vector3d rb = contact.p - contact.b->getPosition();
         Eigen::Vector3d ran = ra.cross(n);

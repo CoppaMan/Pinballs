@@ -49,9 +49,10 @@ public:
 
         m_objects[0].setScale(1);
         m_objects[0].setType(ObjType::STATIC);
+        m_objects[0].setPosition(Eigen::Vector3d(0, 0, 0));
         //p_table->setType(ObjType::STATIC);
-        m_objects[1].setScale(0.002);
-        m_objects[1].setPosition(Eigen::Vector3d(0, -0.2, 0));
+        m_objects[1].setScale(0.005);
+        m_objects[1].setPosition(Eigen::Vector3d(0, 1, 0));
         m_objects[1].setMass(1);
 
         Eigen::MatrixXd color(1, 3);
