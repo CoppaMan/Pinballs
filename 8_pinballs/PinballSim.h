@@ -30,6 +30,7 @@ public:
         m_objects.clear();
         m_objects.push_back(Table());
         p_table = (Table*)&m_objects.back();
+
         m_objects.push_back(Ball());
         p_ball = (Ball*)&m_objects.back();
 
@@ -50,6 +51,15 @@ public:
         m_objects[0].setScale(1);
         m_objects[0].setType(ObjType::STATIC);
         m_objects[0].setPosition(Eigen::Vector3d(0, 0, 0));
+
+        Eigen::Matrix3d rotation;
+        float theta = 0.5; // tilt table 30°
+        rotation << 1, 0, 0,
+                0, std::cos(theta), -std::sin(theta),
+                0, std::sin(theta), std::cos(theta);
+
+        m_objects[0].setRotation(rotation);
+
         //p_table->setType(ObjType::STATIC);
         m_objects[1].setScale(0.005);
         m_objects[1].setPosition(Eigen::Vector3d(0, 1, 0));
