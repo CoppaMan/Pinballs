@@ -2,7 +2,7 @@
 
 class Table : public RigidObject {
 public:
-    Table() : RigidObject("table2.obj") {
+    Table() : RigidObject("table_with_guards.obj") {
 
     }
 };
