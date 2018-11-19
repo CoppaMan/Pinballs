@@ -23,10 +23,7 @@ public:
     Table* p_table;
     Ball* p_ball;
 
-
-
     virtual void init() override {
-
         m_objects.clear();
         m_objects.push_back(Table());
         p_table = (Table*)&m_objects.back();
@@ -52,13 +49,20 @@ public:
         m_objects[0].setType(ObjType::STATIC);
         m_objects[0].setPosition(Eigen::Vector3d(0, 0, 0));
 
-        Eigen::Matrix3d rotation;
-        float theta = 0.5; // tilt table 30°
-        rotation << 1, 0, 0,
-                0, std::cos(theta), -std::sin(theta),
-                0, std::sin(theta), std::cos(theta);
+        Eigen::Matrix3d rotation_y;
+        float theta = -1.5; // rotate table back 45°
+        rotation_y << cos(theta), 0, sin(theta),
+                0, 1, 0,
+                -sin(theta), 0, cos(theta);
 
-        m_objects[0].setRotation(rotation);
+        Eigen::Matrix3d rotation_x;
+        theta = -0.5; // tilt table 30°
+        rotation_x << std::cos(theta), -std::sin(theta), 0,
+                std::sin(theta), std::cos(theta) ,0,
+                0, 0, 1;
+
+
+        m_objects[0].setRotation(rotation_y*(rotation_x));
 
         //p_table->setType(ObjType::STATIC);
         m_objects[1].setScale(0.005);

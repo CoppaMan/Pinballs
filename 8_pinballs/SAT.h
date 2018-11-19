@@ -43,7 +43,7 @@ public:
         std::vector<Axis> axis1 = getAxis(V1, F1);
         std::vector<Axis> axis2 = getAxis(V2, F2);
 
-        if (!check_overlap(axis1, V1, V2, contact) || !check_overlap(axis2, V1, V2, contact) ) {
+        if (!check_overlap(axis1, V1, V2, contact) || !check_overlap(axis2, V2, V1, contact) ) {
             return false;
         }
         return true;
