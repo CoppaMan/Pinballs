@@ -13,8 +13,8 @@ enum class ContactType { VERTEXFACE, EDGEEDGE, NONE };
 struct Contact {
     RigidObject* a;      // body containing vertex
     RigidObject* b;      // body containing face
-    Eigen::Vector3d n;   // world-space vertex location
-    Eigen::Vector3d p;   // outwards pointing normal of face
+    Eigen::Vector3d n;   // outwards pointing normal of face
+    Eigen::Vector3d p;   // world-space vertex location
     Eigen::Vector3d ea;  // edge direction for A
     Eigen::Vector3d eb;  // edge direction for B
 

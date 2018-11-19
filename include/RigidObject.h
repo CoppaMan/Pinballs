@@ -3,6 +3,7 @@
 
 #include "BaseObject.h"
 #include "../8_pinballs/Effect.h"
+#include "BoundingObject.h"
 
 /*
  * Base class representing a simple rigid object.
@@ -11,7 +12,8 @@ class RigidObject : public BaseObject {
    public:
     RigidObject();
     RigidObject(const std::string& mesh_path,
-                const ObjType t = ObjType::DYNAMIC);
+                const ObjType t = ObjType::DYNAMIC,
+                BOUNDING_TYPE bounding_Type = BOUNDING_TYPE::BOX);
 
     void applyForceToCOM(const Eigen::Vector3d& f);
     /*
@@ -37,6 +39,8 @@ class RigidObject : public BaseObject {
     void resetForce();
     void resetTorque();
 
+    virtual std::shared_ptr<BoundingObject> getBoundingObject() const;
+    BOUNDING_TYPE getBoundingType() const;
     double getMass() const;
     double getMassInv() const;
     Eigen::Matrix3d getInertia() const;
@@ -58,6 +62,7 @@ class RigidObject : public BaseObject {
    private:
     double m_mass;                 // Body mass
     double m_massInv;              // Inverted mass
+    BOUNDING_TYPE m_bounding_type;
     Eigen::Matrix3d m_inertia;     // Intertial Tensor (initially set to cube)
     Eigen::Matrix3d m_inertiaInv;  // Inverse
 
@@ -68,6 +73,7 @@ class RigidObject : public BaseObject {
     Eigen::Vector3d m_torque;  // Torque on body
 
     std::vector<Effect> effects; // Triggers certain effects during different parts of the simulation
+
 };
 
 #endif

@@ -1,11 +1,13 @@
 #include "RigidObject.h"
+#include "../8_pinballs/AABB.h"
 
 RigidObject::RigidObject() {}
 
-RigidObject::RigidObject(const std::string& mesh_file, const ObjType t) {
+RigidObject::RigidObject(const std::string& mesh_file, const ObjType t, BOUNDING_TYPE bounding_Type) : m_bounding_type(bounding_Type) {
     findAndLoadMesh(mesh_file);
     setType(t);
     setMass(1.0);
+
 
     // inertia of cube
     setInertia(getMass() * 2.0 / 6.0 * Eigen::Matrix3d::Identity());
@@ -115,6 +117,18 @@ void RigidObject::setTorque(const Eigen::Vector3d& t) {
     if (m_type != ObjType::DYNAMIC) return;
 
     m_torque = t;
+}
+
+
+BOUNDING_TYPE RigidObject::getBoundingType() const {
+    return m_bounding_type;
+}
+
+std::shared_ptr<BoundingObject> RigidObject::getBoundingObject() const {
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+    getMesh(V, F);
+    return std::make_shared<BoundingBox>(V);
 }
 
 void RigidObject::resetForce() { m_force.setZero(); };

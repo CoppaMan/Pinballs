@@ -1,4 +1,32 @@
 #include "CollisionDetection.h"
+#include "BoundingSphere.h"
+#include "CollisionDetectionHelper.h"
+#include "SAT.h"
+
+
+inline bool isCollision(std::shared_ptr<BoundingObject> r1, std::shared_ptr<BoundingObject> r2) {
+    switch (r1->getBoundingType()) {
+        case SPHERE: {
+            std::shared_ptr<BoundingSphere> s1 = std::dynamic_pointer_cast<BoundingSphere> (r1);
+            switch (r2->getBoundingType()) {
+                case SPHERE:
+                    return CollisionDetectionHelper::isCollision(s1, std::dynamic_pointer_cast<BoundingSphere>(r2));
+                case BOX:
+                    return CollisionDetectionHelper::isCollision(s1, std::dynamic_pointer_cast<BoundingBox> (r2));
+            }
+        }
+        case BOX: {
+            std::shared_ptr<BoundingBox> b1 = std::dynamic_pointer_cast<BoundingBox> (r1);
+            switch (r2->getBoundingType()) {
+                case SPHERE:
+                    return CollisionDetectionHelper::isCollision(std::dynamic_pointer_cast<BoundingSphere>(r2), b1);
+                case BOX:
+                    return CollisionDetectionHelper::isCollision(b1, std::dynamic_pointer_cast<BoundingBox> (r2));
+            }
+        }
+    }
+    throw "Should never reach this point";
+}
 
 void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
     // compute possible collisions
@@ -16,15 +44,17 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
      
 	case 1: {  // AABB
         // compute bounding boxes
-        std::vector<AABB> aabbs(m_objects.size());
+        std::vector<std::shared_ptr<BoundingObject>> aabbs(m_objects.size());
         for (size_t i = 0; i < aabbs.size(); i++) {
-            aabbs[i].computeAABB(m_objects[i]);
+            aabbs[i] = m_objects[i].getBoundingObject();
         }
+
+
         for (size_t i = 0; i < m_objects.size(); i++) {
             for (size_t j = i + 1; j < m_objects.size(); j++) {
                 // add pair of objects to possible collision if their
                 // bounding boxes overlap
-                if (aabbs[i].testCollision(aabbs[j])) {
+                if (isCollision(aabbs[i], aabbs[j])) {
                     m_overlappingBodys.push_back(std::make_pair(i, j));
                 }
             }
@@ -38,6 +68,8 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
 	}
 	}
 }
+
+
 
 void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
     switch (narrowPhaseMethod) {
@@ -165,6 +197,27 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
     }
 
 	case 1: {
+
+        for (auto overlap : m_overlappingBodys) {
+            RigidObject *obj1 = &m_objects[overlap.first];
+            RigidObject *obj2 = &m_objects[overlap.second];
+
+            Vertices V1;
+            Faces F1;
+            obj1->getMesh(V1, F1);
+
+            Vertices V2;
+            Faces F2;
+            obj2->getMesh(V2, F2);
+
+            Contact contact;
+            contact.a = obj1;
+            contact.b = obj2;
+
+            if (SAT::intersect(V1, F1, V2, F2, contact)) {
+                m_contacts.push_back(contact);
+            }
+        }
 		// TODO
 		break;
 	}
