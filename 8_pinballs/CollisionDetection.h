@@ -8,6 +8,22 @@
 #include "AABB.h"
 #include "RigidObject.h"
 
+
+typedef Eigen::Vector3d vec3;
+typedef Eigen::MatrixXd Vertices;
+typedef Eigen::MatrixXi Faces;
+
+struct Shape {
+    Vertices &V;
+    Faces &F;
+    Eigen::MatrixXd N_faces; // Should be dimension n*3
+
+    Shape(Vertices &_V, Faces &_F) : V(_V), F(_F) {
+        igl::per_face_normals(_V, _F, N_faces); // fill face normals
+    }
+};
+
+
 enum class ContactType { VERTEXFACE, EDGEEDGE, NONE };
 
 struct Contact {
@@ -15,6 +31,9 @@ struct Contact {
     RigidObject* b;      // body containing face
     Eigen::Vector3d n;   // outwards pointing normal of face
     Eigen::Vector3d p;   // world-space vertex location
+    float penetration; // negative for seperating objects
+
+
     Eigen::Vector3d ea;  // edge direction for A
     Eigen::Vector3d eb;  // edge direction for B
 

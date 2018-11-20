@@ -2,6 +2,7 @@
 #include "BoundingSphere.h"
 #include "CollisionDetectionHelper.h"
 #include "SAT.h"
+#include "gjk2.h"
 
 
 inline bool isCollision(std::shared_ptr<BoundingObject> r1, std::shared_ptr<BoundingObject> r2) {
@@ -220,7 +221,34 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
         }
 		// TODO
 		break;
-	}
+	} 
+    case 2: {
+        for (auto overlap: m_overlappingBodys) {
+            RigidObject *obj1 = &m_objects[overlap.first];
+            RigidObject *obj2 = &m_objects[overlap.second];
+
+            Vertices V1;
+            Faces F1;
+            obj1->getMesh(V1, F1);
+            Shape A(V1, F1);
+
+            Vertices V2;
+            Faces F2;
+            obj2->getMesh(V2, F2);
+            Shape B(V2, F2);
+
+
+            Contact contact;
+            contact.a = obj1;
+            contact.b = obj2;
+
+
+            if (GJK::run(A, B, contact)) {
+                m_contacts.push_back(contact);
+            }
+        }
+
+    }
     }
 }
 
@@ -284,11 +312,11 @@ void CollisionDetection::applyImpulse(double eps) {
 
         switch (contact.b->getType()) {
             case ObjType::DYNAMIC:
-                contact.b->setLinearMomentum(v_new_a);
-                contact.b->setAngularMomentum(w1);
+                contact.b->setLinearMomentum(v_new_b);
+                contact.b->setAngularMomentum(w2);
                 break;
             case ObjType::ROTATION_ONLY:
-                contact.b->setAngularMomentum(w1);
+                contact.b->setAngularMomentum(w2);
                 break;
             case ObjType::STATIC:
                 break;

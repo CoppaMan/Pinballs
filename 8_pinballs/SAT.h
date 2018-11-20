@@ -6,9 +6,6 @@
 #include "CollisionDetection.h"
 
 
-typedef Eigen::Vector3d vec3;
-typedef Eigen::MatrixXd Vertices;
-typedef Eigen::MatrixXi Faces;
 
 struct Projection {
     double min;
@@ -22,14 +19,131 @@ struct Axis {
 
 };
 
+struct SATResult {
+    vec3 s_min;
+    float d_min;
+};
+
+
 class SAT {
 
 public:
+
+
+    static vec3 proj(vec3 &v, vec3 &e, vec3 &v0_e) {
+        return v0_e + e*((v - v0_e)).dot(e);
+    }
+
+    static SATResult run(Shape &A, Shape &B, Contact &contact) {
+        SATResult result = {vec3(0,0,0), -10000};
+
+
+        for (int i = 0; i < A.F.rows(); i++) { // check FaceVertex
+            vec3 n = -A.N_faces.row(i).transpose();
+            checkDirections(n, A, B, result);
+        }
+        for (int i = 0; i < B.F.rows(); i++) { // check VertexFace
+            vec3 n = B.N_faces.row(i).transpose();
+            checkDirections(n, A, B, result);
+        }
+
+        for (int i = 0; i < A.F.rows(); i++) { // EE -> this is the n^2 part which we should optimize
+            for (int j = 0; j < B.F.rows(); j++) {
+                for (int k = 0; k < 2; k++) {
+                    int Ap1 = A.F.row(i).col(k).value();
+                    int Ap2 = A.F.row(i).col((k + 1) % 3).value();
+
+                    int Bp1 = B.F.row(i).col(k).value();
+                    int Bp2 = B.F.row(i).col((k + 1) % 3).value();
+
+                    vec3 Aedge = (A.V.row(Ap2).transpose() - A.V.row(Ap1).transpose()).normalized();
+                    vec3 Bedge = (B.V.row(Bp2).transpose() - B.V.row(Bp1).transpose()).normalized();
+
+                    vec3 s_new = Aedge.cross(Bedge);
+                    checkDirections(s_new, A, B, result);
+                    checkDirections(-s_new, A, B, result);
+                }
+            }
+        }
+
+        if (result.d_min <= 0) {
+            return result; // skip VV, VE, EV
+        }
+
+        // VV
+        for (int i = 0; i < A.V.rows(); i++) { 
+            vec3 vA = A.V.row(i).transpose();
+            for (int j = 0; j < B.V.rows(); j++) {
+                vec3 vB = B.V.row(j).transpose();
+                checkDirections(vA - vB, A, B, result);
+            }
+        }
+
+        // VE
+        for (int i = 0; i < A.V.rows(); i++) { 
+            vec3 vA = A.V.row(i).transpose();
+            for (int j = 0; j < B.F.rows(); j++) {
+                for (int k = 0; k < 2; k++) {
+                    int Bp1 = B.F.row(j).col(k).value();
+                    int Bp2 = B.F.row(j).col((k + 1) % 3).value();
+                    vec3 e_v1 = B.V.row(Bp1).transpose();
+                    vec3 Bedge = (B.V.row(Bp2).transpose() - e_v1).normalized();
+                    // possible optimization: proj(vA, edgeB) element of edgeB only then check 
+                    checkDirections(vA - proj(vA, Bedge, e_v1), A, B, result);
+                }
+            }
+        }
+
+        // EV
+        for (int i = 0; i < B.V.rows(); i++) { 
+            vec3 vB = B.V.row(i).transpose();
+            for (int j = 0; j < A.F.rows(); j++) {
+                for (int k = 0; k < 2; k++) {
+                    int Ap1 = A.F.row(j).col(k).value();
+                    int Ap2 = A.F.row(j).col((k + 1) % 3).value();
+                    vec3 e_v1 = A.V.row(Ap1).transpose();
+                    vec3 Aedge = (A.V.row(Ap2).transpose() - e_v1).normalized();
+                    // possible optimization: proj(vA, edgeB) element of edgeB only then check 
+                    checkDirections(vB - proj(vB, Aedge, e_v1), A, B, result);
+                }
+            }
+        }
+
+        return result;
+
+    }
+
+
+    inline static bool checkDirections(const vec3 &s, const Shape &A, const Shape &B, SATResult &results) {
+        if (s.norm() != 0) {// ignore degenerate case
+            vec3 s_ = s.normalized();
+            double d = support(A, s_) + support(B, -s_);
+            if (d > results.d_min) {
+                results.d_min = d;
+                results.s_min = s_;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    inline static double support(const Shape &A, const vec3 &s) {
+        Eigen::VectorXd proj = A.V*s;
+        //Eigen::MatrixXf::Index maxIndex;
+        //proj.maxCoeff(&maxIndex);
+        //return A.V.row(maxIndex).transpose();
+        return proj.minCoeff();
+    }
+
 
     static bool check_overlap(std::vector<Axis> &axis, Vertices &V1, Vertices &V2, Contact &contact) {
         for (Axis ax : axis) {
             Projection p1 = project(V1, ax.n);
             Projection p2 = project(V2, ax.n);
+
+            RigidObject *objA = contact.a;
+            RigidObject *objB = contact.b;
+
 
             if (!overlap(p1, p2)) {
                 return false;
@@ -39,7 +153,16 @@ public:
         }
         return true;
     }
+
     static bool intersect(Vertices &V1, Faces &F1, Vertices &V2, Faces &F2, Contact &contact) {
+        Shape A(V1, F1);
+        Shape B(V2, F2);
+
+        SATResult result =  run(A, B, contact);
+        return result.d_min <= 0;
+    }
+
+    static bool intersect2(Vertices &V1, Faces &F1, Vertices &V2, Faces &F2, Contact &contact) {
         std::vector<Axis> axis1 = getAxis(V1, F1);
         std::vector<Axis> axis2 = getAxis(V2, F2);
 
