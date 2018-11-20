@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "Paddle.h"
 #include "CollisionDetection.h"
+#include "SFML/Window/Keyboard.hpp"
 
 using namespace std;
 
@@ -23,7 +24,6 @@ public:
     // SCENE OBJECS
     Table* p_table;
     Ball* p_ball;
-    Paddle* p_paddle_l;
     Paddle* p_paddle_r;
 
     virtual void init() override {
@@ -34,11 +34,8 @@ public:
         m_objects.push_back(Ball());
         p_ball = (Ball*)&m_objects.back();
 
-        m_objects.push_back(Paddle()); // m_objects[2]
+        m_objects.push_back(Paddle(sf::Keyboard::Key::Right)); // m_objects[2]
         p_paddle_r = (Paddle*)&m_objects.back();
-
-        //m_objects.push_back(Paddle()); // m_objects[3]
-        //p_paddle_r = (Paddle*)&m_objects.back();
 
         m_collisionDetection.setObjects(m_objects);
 

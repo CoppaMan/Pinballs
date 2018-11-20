@@ -60,7 +60,7 @@ void RigidObject::printDebug(const std::string& message) const {
 void RigidObject::setType(ObjType t) {
     m_type = t;
 
-    if (m_type == ObjType::STATIC) {
+    if (m_type != ObjType::DYNAMIC) {
         m_mass = std::numeric_limits<double>::infinity();
         m_massInv = 0.0;
         m_inertia.setZero();
@@ -90,7 +90,7 @@ void RigidObject::setLinearMomentum(const Eigen::Vector3d& p) {
 }
 
 void RigidObject::setAngularMomentum(const Eigen::Vector3d& l) {
-    if (m_type != ObjType::DYNAMIC) return;
+    if (m_type == ObjType::STATIC) return;
 
     m_w = getInertiaInvWorld() * l;
 }
@@ -102,7 +102,7 @@ void RigidObject::setLinearVelocity(const Eigen::Vector3d& v) {
 }
 
 void RigidObject::setAngularVelocity(const Eigen::Vector3d& w) {
-    if (m_type != ObjType::DYNAMIC) return;
+    if (m_type == ObjType::STATIC) return;
 
     m_w = w;
 }

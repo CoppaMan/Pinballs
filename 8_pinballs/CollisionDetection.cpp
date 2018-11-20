@@ -298,28 +298,14 @@ void CollisionDetection::applyImpulse(double eps) {
         // we have no friction so
 
         //Different outcomes depending on object type
-        switch (contact.a->getType()) {
-            case ObjType::DYNAMIC:
-                contact.a->setLinearMomentum(v_new_a);
-                contact.a->setAngularMomentum(w1);
-                break;
-            case ObjType::ROTATION_ONLY:
-                contact.a->setAngularMomentum(w1);
-                break;
-            case ObjType::STATIC:
-                break;
+        if (contact.a->getType() == ObjType::DYNAMIC) {
+            contact.a->setLinearMomentum(v_new_a);
+            contact.a->setAngularMomentum(w1);
         }
 
-        switch (contact.b->getType()) {
-            case ObjType::DYNAMIC:
-                contact.b->setLinearMomentum(v_new_b);
-                contact.b->setAngularMomentum(w2);
-                break;
-            case ObjType::ROTATION_ONLY:
-                contact.b->setAngularMomentum(w2);
-                break;
-            case ObjType::STATIC:
-                break;
+        if (contact.b->getType() == ObjType::DYNAMIC) {
+            contact.b->setLinearMomentum(v_new_b);
+            contact.b->setAngularMomentum(w2);
         }
 
         //Apply effects stored in RigidObjects eg.
