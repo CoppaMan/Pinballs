@@ -1,4 +1,5 @@
 #include "PinballSim.h"
+#include "SFML/Window/Keyboard.hpp"
 
 bool PinballSim::advance() {
 
@@ -8,13 +9,17 @@ bool PinballSim::advance() {
     // add gravity only to ball
     p_ball->applyForceToCOM(m_gravity);
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+        p_paddle_r->setAngularMomentum(Eigen::Vector3d::UnitY()*3); //Make the flipper spin
+    }
+
     for (auto &o : m_objects) {
         //Apply rotation to flippers
         if(o.getType() == ObjType::ROTATION_ONLY) {
             if(/*corresponding key presses*/0) {
-                o.setAngularMomentum(4*Eigen::Vector3d::UnitZ());
+                //o.setAngularMomentum(4*Eigen::Vector3d::UnitZ());
             } else {
-                o.setAngularMomentum(-4*Eigen::Vector3d::UnitZ());
+                //o.setAngularMomentum(-4*Eigen::Vector3d::UnitZ());
             }
         }
 

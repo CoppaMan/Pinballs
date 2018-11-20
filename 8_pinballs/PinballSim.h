@@ -2,6 +2,7 @@
 #include "Simulation.h"
 #include "Table.h"
 #include "Ball.h"
+#include "Paddle.h"
 #include "CollisionDetection.h"
 
 using namespace std;
@@ -22,6 +23,8 @@ public:
     // SCENE OBJECS
     Table* p_table;
     Ball* p_ball;
+    Paddle* p_paddle_l;
+    Paddle* p_paddle_r;
 
     virtual void init() override {
         m_objects.clear();
@@ -30,6 +33,12 @@ public:
 
         m_objects.push_back(Ball());
         p_ball = (Ball*)&m_objects.back();
+
+        m_objects.push_back(Paddle()); // m_objects[2]
+        p_paddle_r = (Paddle*)&m_objects.back();
+
+        //m_objects.push_back(Paddle()); // m_objects[3]
+        //p_paddle_r = (Paddle*)&m_objects.back();
 
         m_collisionDetection.setObjects(m_objects);
 
@@ -73,7 +82,10 @@ public:
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
         m_objects[1].setColors(color);
 
-
+        m_objects[2].setScale(0.2);
+        m_objects[2].setPosition(Eigen::Vector3d(1.7, -3.2, 5.7));
+        
+        m_objects[2].setRotation(rotation_y*(rotation_x));
     }
 
     virtual void updateRenderGeometry() override {
