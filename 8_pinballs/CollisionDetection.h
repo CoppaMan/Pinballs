@@ -27,8 +27,8 @@ struct Shape {
 enum class ContactType { VERTEXFACE, EDGEEDGE, NONE };
 
 struct Contact {
-    RigidObject* a;      // body containing vertex
-    RigidObject* b;      // body containing face
+    std::shared_ptr<RigidObject> a;     // body containing vertex
+    std::shared_ptr<RigidObject> b;     // body containing face
     Eigen::Vector3d n;   // outwards pointing normal of face
     Eigen::Vector3d p;   // world-space vertex location
     float penetration; // negative for seperating objects
@@ -42,10 +42,10 @@ struct Contact {
 
 class CollisionDetection {
    public:
-    CollisionDetection(std::vector<RigidObject>& world) : m_objects(world) {}
+    CollisionDetection(std::vector<std::shared_ptr<RigidObject>>& world) : m_objects(world) {}
 
     // pass objects in scene to collision detection
-    void setObjects(std::vector<RigidObject>& world) { m_objects = world; }
+    void setObjects(std::vector<std::shared_ptr<RigidObject>>& world) { m_objects = world; }
 
 	void computeBroadPhase(int broadPhaseMethod);
 
@@ -178,7 +178,7 @@ class CollisionDetection {
 
     std::vector<Contact> getContacts() { return m_contacts; }
 
-    std::vector<RigidObject>& m_objects;  // all objects in scene
+    std::vector<std::shared_ptr<RigidObject>>& m_objects;  // all objects in scene
     // result of broadphase, pairs of objects with possible collisions
     std::vector<std::pair<size_t, size_t>> m_overlappingBodys;
 

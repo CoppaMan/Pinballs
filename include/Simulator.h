@@ -157,7 +157,7 @@ class Simulator {
         Eigen::MatrixXd V;
         Eigen::MatrixXi F;
         for (size_t i = 0; i < os.size(); i++) {
-            os[i].getMesh(V, F);
+            os[i]->getMesh(V, F);
             m_record[i].push(std::make_pair(V, F));
             while (m_record[i].size() > (size_t)m_numRecords) {
                 m_record[i].pop();

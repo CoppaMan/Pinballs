@@ -141,8 +141,8 @@ public:
             Projection p1 = project(V1, ax.n);
             Projection p2 = project(V2, ax.n);
 
-            RigidObject *objA = contact.a;
-            RigidObject *objB = contact.b;
+            auto objA = contact.a;
+            auto objB = contact.b;
 
 
             if (!overlap(p1, p2)) {

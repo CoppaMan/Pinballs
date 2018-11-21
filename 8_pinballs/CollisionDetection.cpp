@@ -47,7 +47,7 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
         // compute bounding boxes
         std::vector<std::shared_ptr<BoundingObject>> aabbs(m_objects.size());
         for (size_t i = 0; i < aabbs.size(); i++) {
-            aabbs[i] = m_objects[i].getBoundingObject();
+            aabbs[i] = m_objects[i]->getBoundingObject();
         }
 
 
@@ -82,11 +82,11 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
             // compute intersection of a with b first and intersectino
             // of b with a and store results in temp_contacts
             for (int switcher = 0; switcher < 2; switcher++) {
-                RigidObject* a =
-                    &m_objects[(!switcher) ? overlap.first
+                auto a =
+                    m_objects[(!switcher) ? overlap.first
                                             : overlap.second];
-                RigidObject* b =
-                    &m_objects[(!switcher) ? overlap.second
+                auto b =
+                    m_objects[(!switcher) ? overlap.second
                                             : overlap.first];
 
                 Eigen::MatrixXd Va, Vb;
@@ -200,8 +200,8 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
 	case 1: {
 
         for (auto overlap : m_overlappingBodys) {
-            RigidObject *obj1 = &m_objects[overlap.first];
-            RigidObject *obj2 = &m_objects[overlap.second];
+            auto obj1 = m_objects[overlap.first];
+            auto obj2 = m_objects[overlap.second];
 
             Vertices V1;
             Faces F1;
@@ -224,8 +224,8 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
 	} 
     case 2: {
         for (auto overlap: m_overlappingBodys) {
-            RigidObject *obj1 = &m_objects[overlap.first];
-            RigidObject *obj2 = &m_objects[overlap.second];
+            auto obj1 = m_objects[overlap.first];
+            auto obj2 = m_objects[overlap.second];
 
             Vertices V1;
             Faces F1;

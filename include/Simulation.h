@@ -1,6 +1,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
+#include <memory>
 #include <igl/opengl/glfw/Viewer.h>
 #include "RigidObject.h"
 
@@ -61,7 +62,7 @@ class Simulation {
 
     unsigned long getStep() const { return m_step; }
 
-    std::vector<RigidObject> &getObjects() { return m_objects; }
+    std::vector<std::shared_ptr<RigidObject>> &getObjects() { return m_objects; }
 
    protected:
     /*
@@ -70,7 +71,7 @@ class Simulation {
      */
     virtual void resetMembers() = 0;
 
-    std::vector<RigidObject>
+    std::vector<std::shared_ptr<RigidObject>>
         m_objects;             // vector of all objects in the simulation
     double m_dt = 0.0;         // length of timestep
     double m_time = 0.0;       // current time
