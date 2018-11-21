@@ -2,9 +2,8 @@
 #include "Simulation.h"
 #include "Table.h"
 #include "Ball.h"
-#include "Paddle.h"
 #include "CollisionDetection.h"
-#include "SFML/Window/Keyboard.hpp"
+#include "Paddle.h"
 
 using namespace std;
 

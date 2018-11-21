@@ -12,7 +12,7 @@ bool PinballSim::advance() {
 
     //p_paddle_r->toggle();
 
-     Eigen::Matrix3d r = p_paddle_r->getRotationMatrix();
+    Eigen::Matrix3d r = p_paddle_r->getRotationMatrix();
         double angle = std::atan2(-r(2,0), sqrt(r(2,1)*r(2,1) + r(2,2)*r(2,2)));
         sf::Keyboard::Key key = sf::Keyboard::Key::Right;
         if (sf::Keyboard::isKeyPressed(key)) {
