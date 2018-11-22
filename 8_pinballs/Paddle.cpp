@@ -33,7 +33,6 @@ void Paddle::toggle() { //Control paddle with key set in paddle_key
                 this->setAngularMomentum(Eigen::Vector3d::Zero());
             }
         } else {
-            std::cout << "Upper angle:" << angle << std::endl;
             if(r(0,0) > 0 or angle > 1.0) {
                 this->setAngularMomentum(this->getRotation()*Eigen::Vector3d(0, 5, 0));
             } else {
@@ -48,7 +47,6 @@ void Paddle::toggle() { //Control paddle with key set in paddle_key
                 this->setAngularMomentum(Eigen::Vector3d::Zero());
             }
         } else {
-            std::cout << "Lower angle:" << angle << std::endl;
             if(r(0,0) <= 0 or angle > 0.8) {
                 this->setAngularMomentum(this->getRotation()*Eigen::Vector3d(0, -3, 0));
             } else {

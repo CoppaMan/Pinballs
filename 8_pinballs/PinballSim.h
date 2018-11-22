@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "CollisionDetection.h"
 #include "Paddle.h"
+#include "Score.h"
 
 using namespace std;
 
@@ -16,19 +17,17 @@ public:
     // CONFIGS
     float m_dt = 1e-2;
     Eigen::Vector3d m_gravity;
-    long score = 0;
-    //
-
 
     // SCENE OBJECS
     std::shared_ptr<Table> p_table;
     std::shared_ptr<Ball> p_ball;
     std::shared_ptr<Paddle> p_paddle_r;
     std::shared_ptr<Paddle> p_paddle_l;
+    std::shared_ptr<Score> score;
 
     virtual void init() override {
         m_objects.clear();
-        p_table = std::make_shared<Table>();
+        p_table = std::make_shared<Table>(); //creates shared pointer
         m_objects.emplace_back(p_table);
 
         p_ball = std::make_shared<Ball>();
@@ -39,6 +38,9 @@ public:
 
         p_paddle_l = std::make_shared<Paddle>(sf::Keyboard::Key::Left, Eigen::Vector3d(-1.7, -3.2, 5.7), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
+
+        score = std::make_shared<Score>(Eigen::Vector3d(5.75, 4, -4), 8);
+        score->emplaceInto(&m_objects); //Add all objects related to the visual score
 
         m_collisionDetection.setObjects(m_objects);
 
@@ -84,6 +86,8 @@ public:
 
         p_paddle_r->reset_paddle(); //resets the paddle state
         p_paddle_l->reset_paddle();
+
+        score->resetScore();
     }
 
     virtual void updateRenderGeometry() override {
