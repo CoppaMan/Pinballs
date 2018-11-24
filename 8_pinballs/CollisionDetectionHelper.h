@@ -15,7 +15,8 @@ public:
 
     static inline bool isCollision(const std::shared_ptr<BoundingSphere> s1, const std::shared_ptr<BoundingBox> b1) {
         Eigen::Vector3d nearest_point = b1->m_minCoord.cwiseMax(s1->m_center.cwiseMin(b1->m_maxCoord));
-        return nearest_point.norm() < s1->m_radius;
+        double distance = (nearest_point - s1->m_center).squaredNorm();
+        return distance < s1->m_radius*s1->m_radius;
     }
 
     static inline bool isCollision(const std::shared_ptr<BoundingBox> b1, const std::shared_ptr<BoundingBox> b2) {

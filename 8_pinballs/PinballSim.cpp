@@ -3,7 +3,7 @@
 bool PinballSim::advance() {
 
     // compute the collision detection
-    //m_collisionDetection.computeCollisionDetection(1, 1, m_eps);
+    m_collisionDetection.computeCollisionDetection(1, 2, m_eps);
 
     // add gravity only to ball
     p_ball->applyForceToCOM(m_gravity);
@@ -11,7 +11,7 @@ bool PinballSim::advance() {
     p_paddle_r->toggle(); //Makes the paddle controlable
     p_paddle_l->toggle();
 
-    p_paddle_l->printDebug();
+    //p_paddle_l->printDebug();
 
     for (auto &o : m_objects) {
 

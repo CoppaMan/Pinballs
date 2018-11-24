@@ -255,59 +255,49 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
 void CollisionDetection::applyImpulse(double eps) {
     // compute impulse for all contacts
     for (auto contact : m_contacts) {
-        Eigen::Vector3d va = contact.a->getVelocity(contact.p);
-        Eigen::Vector3d vb = contact.b->getVelocity(contact.p);
-        Eigen::Vector3d n = contact.n;
-        Eigen::Vector3d ra = contact.p - contact.a->getPosition();
-        Eigen::Vector3d rb = contact.p - contact.b->getPosition();
-        Eigen::Vector3d ran = ra.cross(n);
-        Eigen::Vector3d rbn = rb.cross(n);
-        Eigen::Matrix3d iInva = contact.a->getInertiaInvWorld();
-        Eigen::Matrix3d iInvb = contact.b->getInertiaInvWorld();
-
-
-        double vrel = n.dot(va - vb);
+        contact.a->printDebug("Before update");
+        contact.b->printDebug("Before update");
+        std::cout << "Contact normal:" << std::endl;
+        std::cout << contact.n << std::endl;
+        Eigen::Vector3d vrel_vec = contact.a->getVelocity(contact.p) -
+                                   contact.b->getVelocity(contact.p);
+        double vrel = contact.n.dot(vrel_vec);
         if (vrel > 0) {
             // bodies are moving apart
             continue;
         }
 
-        double numerator = -(1 + eps)*vrel;
+        // TODO: compute impulse and update the following momentums
+        Eigen::Vector3d numerator = -(1 + eps) * vrel_vec;
+        double t1 = contact.a->getMassInv();
+        double t2 = contact.b->getMassInv();
+        Eigen::Vector3d ra = contact.p - contact.a->getPosition();
+        Eigen::Vector3d rb = contact.p - contact.b->getPosition();
+        double t3 = contact.n.dot(
+                (contact.a->getInertiaInvWorld() * (ra.cross(contact.n)))
+                        .cross(ra));
+        double t4 = contact.n.dot(
+                (contact.b->getInertiaInvWorld() * (rb.cross(contact.n)))
+                        .cross(rb));
 
-        // denominator
-        double Ma = contact.a->getMassInv();
-        double Mb = contact.b->getMassInv();
-        double M = Ma + Mb;
-
-
-        double termA = n.dot((iInva*ran).cross(ra));
-        double termB = n.dot((iInvb*rbn).cross(rb));
-
-        // impulse magnitude
-        double j = numerator / (M + termA + termB);
-        Eigen::Vector3d force = j * n;
-
-        Eigen::Vector3d v_new_a = contact.a->getLinearMomentum() + force;
-        Eigen::Vector3d v_new_b = contact.b->getLinearMomentum() - force;
-
-        Eigen::Vector3d w1 = contact.a->getAngularMomentum() + ra.cross(force);
-        Eigen::Vector3d w2 = contact.b->getAngularMomentum() + rb.cross(-force);
+        Eigen::Vector3d j = numerator / (t1 + t2 + t3 + t4);
+        Eigen::Vector3d force = j.dot(contact.n) * contact.n;
 
 
-        // vrel <= 0 -> bodies move towards each other
-        // we have no friction so
-
-        //Different outcomes depending on object type
         if (contact.a->getType() == ObjType::DYNAMIC) {
-            contact.a->setLinearMomentum(v_new_a);
-            contact.a->setAngularMomentum(w1);
+            contact.a->setLinearMomentum(contact.a->getLinearMomentum() + force);
+            contact.a->setAngularMomentum(contact.a->getAngularMomentum() +  ra.cross(force));
         }
 
         if (contact.b->getType() == ObjType::DYNAMIC) {
-            contact.b->setLinearMomentum(v_new_b);
-            contact.b->setAngularMomentum(w2);
+
+            contact.b->setLinearMomentum(contact.b->getLinearMomentum() - force);
+
+            contact.b->setAngularMomentum(contact.b->getAngularMomentum() -  rb.cross(force));
         }
 
+        contact.a->printDebug("After update");
+        contact.b->printDebug("After update");
         //Apply effects stored in RigidObjects eg.
         //play sound effect or increase score
         for(auto&& e : contact.a->getEffects()) e.apply();
