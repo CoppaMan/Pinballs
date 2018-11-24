@@ -11,7 +11,8 @@ bool PinballSim::advance() {
     p_paddle_r->toggle(); //Makes the paddle controlable
     p_paddle_l->toggle();
 
-    //p_paddle_l->printDebug();
+    //Score demo, press S key for more score
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))score->addScore(1);
 
     for (auto &o : m_objects) {
 

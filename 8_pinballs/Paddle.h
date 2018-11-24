@@ -1,4 +1,4 @@
-#include <RigidObject.h>
+#include "RigidObject.h"
 #include "SFML/Window/Keyboard.hpp"
 
 class Paddle : public RigidObject {
