@@ -1,6 +1,6 @@
 #include "Paddle.h"
 
-Paddle::Paddle(sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left) : RigidObject("flipper.off", ObjType::DYNAMIC), paddle_key(k), pos(p), facing_left(look_left) {}
+Paddle::Paddle(sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left) : RigidObject("flipper.off", ObjType::ROTATION_ONLY), paddle_key(k), pos(p), facing_left(look_left) {}
 
 void Paddle::reset_paddle() { //Sets paddle back to original orientation
     setScale(0.2);

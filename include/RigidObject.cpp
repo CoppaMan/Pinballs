@@ -60,7 +60,7 @@ void RigidObject::printDebug(const std::string& message) const {
 void RigidObject::setType(ObjType t) {
     m_type = t;
 
-    if (m_type != ObjType::DYNAMIC) {
+    if (m_type == ObjType::STATIC) {
         m_mass = std::numeric_limits<double>::infinity();
         m_massInv = 0.0;
         m_inertia.setZero();
@@ -71,13 +71,13 @@ void RigidObject::setType(ObjType t) {
 }
 
 void RigidObject::setMass(double m) {
-    if (m_type != ObjType::DYNAMIC) return;
+    if (m_type == ObjType::STATIC) return;
     m_mass = m;
     m_massInv = 1.0 / m_mass;
 }
 
 void RigidObject::setInertia(const Eigen::Matrix3d& I) {
-    if (m_type != ObjType::DYNAMIC) return;
+    if (m_type == ObjType::STATIC) return;
 
     m_inertia = I;
     m_inertiaInv = m_inertia.inverse();
