@@ -1,3 +1,5 @@
+#pragma once
+
 #include <RigidObject.h>
 
 class Table : public RigidObject {
