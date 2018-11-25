@@ -55,7 +55,9 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
             for (size_t j = i + 1; j < m_objects.size(); j++) {
                 // add pair of objects to possible collision if their
                 // bounding boxes overlap
-                if (isCollision(aabbs[i], aabbs[j])) {
+                bool a_dynamic = m_objects[i]->getType() == ObjType ::DYNAMIC;
+                bool b_dynamic = m_objects[j]->getType() == ObjType ::DYNAMIC;
+                if ((a_dynamic || b_dynamic) && isCollision(aabbs[i], aabbs[j])) {
                     m_overlappingBodys.push_back(std::make_pair(i, j));
                 }
             }
