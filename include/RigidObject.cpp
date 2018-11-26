@@ -52,8 +52,8 @@ void RigidObject::printDebug(const std::string& message) const {
     std::cout << "angular velocity: " << m_w.transpose() << std::endl;
     std::cout << "force:            " << m_force.transpose() << std::endl;
     std::cout << "torque:           " << m_torque.transpose() << std::endl;
-    std::cout << "mass (inv):           " << m_mass << " (" << m_massInv << ")"
-              << std::endl;
+    std::cout << "mass (inv):       " << m_mass << " (" << m_massInv << ")" << std::endl;
+    std::cout << "effects:          " << effects.size() << std::endl;
 }
 
 #pragma region GettersAndSetters
@@ -170,10 +170,10 @@ Eigen::Vector3d RigidObject::getForce() const { return m_force; }
 
 Eigen::Vector3d RigidObject::getTorque() const { return m_torque; }
 
-void RigidObject::addEffect(Effect e) {
-    effects.push_back(e);
+void RigidObject::addEffect(std::shared_ptr<Effect> e) {
+    effects.emplace_back(e);
 }
 
-std::vector<Effect> RigidObject::getEffects() { return effects; }
+std::vector<std::shared_ptr<Effect>> RigidObject::getEffects() { return effects; }
 
 #pragma endregion GettersAndSetters

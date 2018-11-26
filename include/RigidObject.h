@@ -23,8 +23,8 @@ class RigidObject : public BaseObject {
     void applyTorque(const Eigen::Vector3d& t);
     void printDebug(const std::string& message = "") const;
 
-    void addEffect(Effect e);
-    std::vector<Effect> getEffects();
+    void addEffect(std::shared_ptr<Effect> e);
+    std::vector<std::shared_ptr<Effect>> getEffects();
 
 #pragma region GettersAndSetters
     virtual void setType(ObjType t);
@@ -72,7 +72,7 @@ class RigidObject : public BaseObject {
     Eigen::Vector3d m_force;   // Force on body
     Eigen::Vector3d m_torque;  // Torque on body
 
-    std::vector<Effect> effects; // Triggers certain effects during different parts of the simulation
+    std::vector<std::shared_ptr<Effect>> effects; // Triggers certain effects during different parts of the simulation
 
 };
 

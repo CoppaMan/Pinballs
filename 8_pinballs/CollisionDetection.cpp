@@ -302,7 +302,7 @@ void CollisionDetection::applyImpulse(double eps) {
         contact.b->printDebug("After update");
         //Apply effects stored in RigidObjects eg.
         //play sound effect or increase score
-        for(auto&& e : contact.a->getEffects()) e.apply();
-        for(auto&& e : contact.b->getEffects()) e.apply();
+        for(auto e : contact.a->getEffects()) e->apply();
+        for(auto e : contact.b->getEffects()) e->apply();
     }
 }

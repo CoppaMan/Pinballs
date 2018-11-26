@@ -5,7 +5,16 @@
 #include "CollisionDetection.h"
 #include "Paddle.h"
 #include "Score.h"
-#include "Guard.h"
+#include "Obstacle.h"
+#include "ScoreEffect.h"
+
+//Import settings from blender:
+//Forward is +X
+//Up is +Y
+
+//Green (Up) is +Y
+//Blue (Forward) is +Z
+//Red (Right) is -X
 
 using namespace std;
 
@@ -24,10 +33,16 @@ public:
     std::shared_ptr<Ball> p_ball;
     std::shared_ptr<Paddle> p_paddle_r;
     std::shared_ptr<Paddle> p_paddle_l;
-    std::shared_ptr<Guard> guard;
+    std::shared_ptr<Obstacle> guard_l; //guard_r;
     std::shared_ptr<Score> score;
+    std::shared_ptr<Obstacle> bmp_0;
+    std::shared_ptr<Obstacle> bmp_1;
+
+    std::shared_ptr<ScoreEffect> add250points;
 
     virtual void init() override {
+        add250points = std::make_shared<ScoreEffect>(this, 250);
+
         m_objects.clear();
         p_ball = std::make_shared<Ball>();
         m_objects.emplace_back(p_ball);
@@ -41,8 +56,19 @@ public:
         p_paddle_l = std::make_shared<Paddle>(sf::Keyboard::Key::Left, Eigen::Vector3d(-1.7, -3.2, 5.7), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
 
-        guard = std::make_shared<Guard>(p_table, Eigen::Vector3d(0,0,0), M_PI/2.0);
-        guard->emplaceInto(&m_objects);
+        //guard_l = std::make_shared<Obstacle>(p_table, "guard", 6, Eigen::Vector3d(3,0,0), 0, true);
+        //guard_l->emplaceInto(&m_objects);
+
+        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1,0,-1), 0, false);
+        bmp_0->emplaceInto(&m_objects);
+        bmp_0->addEffect(add250points);
+
+        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,-1), 0, false);
+        bmp_1->emplaceInto(&m_objects);
+        bmp_0->addEffect(add250points);
+
+        //guard_r = std::make_shared<Obstacle>(p_table, "guard", 6, Eigen::Vector3d(-3,0,0), 0, true);
+        //guard_r->emplaceInto(&m_objects);
 
         score = std::make_shared<Score>(Eigen::Vector3d(5.75, 4, -4), 8);
         score->emplaceInto(&m_objects); //Add all objects related to the visual score
@@ -60,29 +86,11 @@ public:
             o->reset();
         }
 
-        p_table->setScale(1);
-        p_table->setType(ObjType::STATIC);
-        p_table->setPosition(Eigen::Vector3d(0, 0, 0));
-
-        
-        Eigen::Matrix3d rotation_y;
-        float theta = -M_PI/2.0; // rotate table back 45°
-        rotation_y << cos(theta), 0, sin(theta),
-                0, 1, 0,
-                -sin(theta), 0, cos(theta);
-
-        Eigen::Matrix3d rotation_x;
-        theta = -M_PI/6.0; // tilt table 30°
-        rotation_x << std::cos(theta), -std::sin(theta), 0,
-                std::sin(theta), std::cos(theta) ,0,
-                0, 0, 1;
-        
-
-        p_table->setRotation(rotation_y*(rotation_x));
+        p_table->resetTable();
 
         //p_table->setType(ObjType::STATIC);
         p_ball->setScale(0.005);
-        p_ball->setPosition(Eigen::Vector3d(1.5, 0.5, 0));
+        p_ball->setPosition(Eigen::Vector3d(0.9, 0.7, -1.2));
         p_ball->setMass(1);
 
         Eigen::MatrixXd color(1, 3);
@@ -91,7 +99,10 @@ public:
 
         p_paddle_r->reset_paddle(); //resets the paddle state
         p_paddle_l->reset_paddle();
-        guard->resetGuard();
+        //guard_l->resetObstacle();
+        //guard_r->resetObstacle();
+        bmp_0->resetObstacle();
+        bmp_1->resetObstacle();
         score->resetScore();
     }
 
