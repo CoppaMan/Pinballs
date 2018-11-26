@@ -14,7 +14,7 @@
 
 //Green (Up) is +Y
 //Blue (Forward) is +Z
-//Red (Right) is -X
+//Red (Right) is +X
 
 using namespace std;
 
@@ -56,19 +56,11 @@ public:
         p_paddle_l = std::make_shared<Paddle>(sf::Keyboard::Key::Left, Eigen::Vector3d(-1.7, -3.2, 5.7), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
 
-        //guard_l = std::make_shared<Obstacle>(p_table, "guard", 6, Eigen::Vector3d(3,0,0), 0, true);
-        //guard_l->emplaceInto(&m_objects);
-
-        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1,0,-1), 0, false);
+        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.8,0,3), 0, false);
         bmp_0->emplaceInto(&m_objects);
-        bmp_0->addEffect(add250points);
 
-        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,-1), 0, false);
+        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,2), 0, false);
         bmp_1->emplaceInto(&m_objects);
-        bmp_0->addEffect(add250points);
-
-        //guard_r = std::make_shared<Obstacle>(p_table, "guard", 6, Eigen::Vector3d(-3,0,0), 0, true);
-        //guard_r->emplaceInto(&m_objects);
 
         score = std::make_shared<Score>(Eigen::Vector3d(5.75, 4, -4), 8);
         score->emplaceInto(&m_objects); //Add all objects related to the visual score
@@ -99,10 +91,10 @@ public:
 
         p_paddle_r->reset_paddle(); //resets the paddle state
         p_paddle_l->reset_paddle();
-        //guard_l->resetObstacle();
-        //guard_r->resetObstacle();
         bmp_0->resetObstacle();
+        bmp_0->addEffect(add250points);
         bmp_1->resetObstacle();
+        bmp_1->addEffect(add250points);
         score->resetScore();
     }
 

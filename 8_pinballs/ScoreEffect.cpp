@@ -1,9 +1,9 @@
 #include "ScoreEffect.h"
 #include "PinballSim.h"
 
-ScoreEffect::ScoreEffect(PinballSim *sim, long new_v) : value(new_v), Effect(sim) {}
+ScoreEffect::ScoreEffect(PinballSim *sim, long new_v) : Effect(sim, 0.5), value(new_v) {}
 
-void ScoreEffect::apply() {
+void ScoreEffect::run() {
     std::cout << "Increased score by " << value << std::endl;
     ps->score->addScore(value);
 }

@@ -19,6 +19,7 @@ void RigidObject::resetMembers() {
     setAngularMomentum(Eigen::Vector3d::Zero());
     resetForce();
     resetTorque();
+    effects.clear();
 }
 
 void RigidObject::applyForceToCOM(const Eigen::Vector3d& f) {

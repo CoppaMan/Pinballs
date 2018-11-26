@@ -5,7 +5,7 @@
 class ScoreEffect : public Effect {
     public:
         ScoreEffect(PinballSim *sim, long new_v);
-        void apply() override;
+        void run();
     private:
         long value;
 };
