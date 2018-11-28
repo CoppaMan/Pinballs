@@ -2,6 +2,7 @@
 
 #include "Segment.h"
 #include <memory>
+#include <vector>
 
 class Digit {
     public:
@@ -12,7 +13,7 @@ class Digit {
         void resetDigit();
     private:
         int digit = 0;
-        std::shared_ptr<Segment> segments[7];
+        std::vector<std::shared_ptr<Segment>> segments;
         bool bitmap[7];
         Eigen::Vector3d pos;
         void allTrue(bool bm[]);

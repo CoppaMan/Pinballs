@@ -1,24 +1,17 @@
 #pragma once
 
-#include <RigidObject.h>
+#include "RigidObject.h"
+#include <vector>
 
-class Table : public RigidObject {
-public:
-    Table() : RigidObject("table_surface.off") {
-        resetTable();
-    }
-
-    void resetTable() {
-        setScale(1);
-        setType(ObjType::STATIC);
-        setPosition(Eigen::Vector3d(0, 0, 0));
-
-        Eigen::Matrix3d tilt;
-        double theta = M_PI/6.0; // tilt table 30°
-        tilt << 1, 0, 0,
-                    0, std::cos(theta), -std::sin(theta),
-                    0, std::sin(theta), std::cos(theta);
-                
-        setRotation(tilt);
-    }
+class Table {
+    public:
+        Table();
+        void emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj);
+        void resetTable();
+        Eigen::Vector3d getPosition();
+        Eigen::Matrix3d getRotation();
+    private:
+        std::vector<std::shared_ptr<RigidObject>> parts;
+        Eigen::Vector3d pos;
+        Eigen::Matrix3d rot;
 };

@@ -72,13 +72,13 @@ void RigidObject::setType(ObjType t) {
 }
 
 void RigidObject::setMass(double m) {
-    if (m_type == ObjType::STATIC) return;
+    if (m_type == ObjType::STATIC or m_type == ObjType::INTANGIBLE) return;
     m_mass = m;
     m_massInv = 1.0 / m_mass;
 }
 
 void RigidObject::setInertia(const Eigen::Matrix3d& I) {
-    if (m_type == ObjType::STATIC) return;
+    if (m_type == ObjType::STATIC or m_type == ObjType::INTANGIBLE) return;
 
     m_inertia = I;
     m_inertiaInv = m_inertia.inverse();
@@ -91,7 +91,7 @@ void RigidObject::setLinearMomentum(const Eigen::Vector3d& p) {
 }
 
 void RigidObject::setAngularMomentum(const Eigen::Vector3d& l) {
-    if (m_type == ObjType::STATIC) return;
+    if (m_type == ObjType::STATIC or m_type == ObjType::INTANGIBLE) return;
 
     m_w = getInertiaInvWorld() * l;
 }
@@ -103,7 +103,7 @@ void RigidObject::setLinearVelocity(const Eigen::Vector3d& v) {
 }
 
 void RigidObject::setAngularVelocity(const Eigen::Vector3d& w) {
-    if (m_type == ObjType::STATIC) return;
+    if (m_type == ObjType::STATIC or m_type == ObjType::INTANGIBLE) return;
 
     m_w = w;
 }

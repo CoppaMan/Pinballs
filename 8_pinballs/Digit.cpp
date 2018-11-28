@@ -3,13 +3,13 @@
 #include "Segment.h"
 
 Digit::Digit(Eigen::Vector3d p) : pos(p) , digit(0) {
-    segments[0] = std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,2,0), true);
-    segments[1] = std::make_shared<Segment>(pos + Eigen::Vector3d(-1,1.5,0), false);
-    segments[2] = std::make_shared<Segment>(pos + Eigen::Vector3d(0,1.5,0), false);
-    segments[3] = std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,1,0), true);
-    segments[4] = std::make_shared<Segment>(pos + Eigen::Vector3d(-1,0.5,0), false);
-    segments[5] = std::make_shared<Segment>(pos + Eigen::Vector3d(0,0.5,0), false);
-    segments[6] = std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,0,0), true);
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,2,0), true));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-1,1.5,0), false));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(0,1.5,0), false));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,1,0), true));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-1,0.5,0), false));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(0,0.5,0), false));
+    segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,0,0), true));
 }
 
 void Digit::update_digit(int d) {
@@ -56,9 +56,9 @@ void Digit::emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj) {
 
 void Digit::resetDigit() {
     digit = 0;
-    segments[0]->resetSegment(true);
-    segments[1]->resetSegment(true);
-    segments[2]->resetSegment(true);
+    segments.at(0)->resetSegment(true);
+    segments.at(1)->resetSegment(true);
+    segments.at(2)->resetSegment(true);
     segments[3]->resetSegment(false);
     segments[4]->resetSegment(true);
     segments[5]->resetSegment(true);

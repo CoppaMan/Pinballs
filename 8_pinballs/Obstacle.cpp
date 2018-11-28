@@ -2,7 +2,7 @@
 #include <string>
 
 Obstacle::Obstacle(std::shared_ptr<Table> table, std::string name, int count, Eigen::Vector3d pos, double angle, bool mirror) : table(table), pos_rel(pos), rot_rel(angle), mirrored(mirror) {
-    pos_abs = table->getPosition() + (table->getRotationMatrix()*pos_rel);
+    pos_abs = table->getPosition() + (table->getRotation()*pos_rel);
 
     Eigen::Matrix3d spin;
     spin << cos(angle), 0, sin(angle),

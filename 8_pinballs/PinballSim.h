@@ -48,7 +48,7 @@ public:
         m_objects.emplace_back(p_ball);
 
         p_table = std::make_shared<Table>();
-        m_objects.emplace_back(p_table);
+        p_table->emplaceInto(&m_objects);
 
         p_paddle_r = std::make_shared<Paddle>(sf::Keyboard::Key::Right, Eigen::Vector3d(1.7, -3.2, 5.7), true);
         m_objects.emplace_back(p_paddle_r); // Right paddle
