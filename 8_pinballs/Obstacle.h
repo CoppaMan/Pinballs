@@ -11,6 +11,7 @@ class Obstacle {
         void emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj);
         void resetObstacle();
         void addEffect(std::shared_ptr<Effect> effect);
+        void printDebug();
     private:
         int count;
         std::shared_ptr<Table> table;

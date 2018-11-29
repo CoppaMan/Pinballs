@@ -15,7 +15,7 @@ bool PinballSim::advance() {
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))score->addScore(1);
 
     for (auto o : m_objects) {
-        if(o->getType() == ObjType::INTANGIBLE) continue;
+        //if(o->getType() != ObjType::DYNAMIC) continue;
 
         // integrate velocities
         o->setLinearMomentum(o->getLinearMomentum() + m_dt * o->getMassInv() * o->getForce());

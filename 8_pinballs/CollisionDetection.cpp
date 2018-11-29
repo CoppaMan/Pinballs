@@ -284,7 +284,7 @@ void CollisionDetection::applyImpulse(double eps) {
 
         Eigen::Vector3d j = numerator / (t1 + t2 + t3 + t4);
         Eigen::Vector3d force = j.dot(contact.n) * contact.n;
-
+        force *= 0.99;
 
         if (contact.a->getType() == ObjType::DYNAMIC) {
             contact.a->setLinearMomentum(contact.a->getLinearMomentum() + force);
@@ -292,9 +292,7 @@ void CollisionDetection::applyImpulse(double eps) {
         }
 
         if (contact.b->getType() == ObjType::DYNAMIC) {
-
             contact.b->setLinearMomentum(contact.b->getLinearMomentum() - force);
-
             contact.b->setAngularMomentum(contact.b->getAngularMomentum() -  rb.cross(force));
         }
 

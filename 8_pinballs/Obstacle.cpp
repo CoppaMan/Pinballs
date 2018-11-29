@@ -40,3 +40,10 @@ void Obstacle::addEffect(std::shared_ptr<Effect> e) {
     std::cout << "Adding effect " << std::endl;
     for(auto p : parts) p->addEffect(e);
 }
+
+void Obstacle::printDebug() {
+    for(int i = 0; i < parts.size(); i++) {
+        std::cout << "Part " << i << ":" << std::endl;
+        parts.at(i)->printDebug();
+    } 
+}
