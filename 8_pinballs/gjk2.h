@@ -17,13 +17,9 @@ public:
 
     static bool run(const Shape &A, const Shape &B, Contact &contact) {
         int GJK_MAXITR = 32;
-
         vec3 new_search_dir = A.V.row(0).transpose() - B.V.row(0).transpose();
-
-
         vec3 a,b,c,d;
         int num_dim = 0;
-
         a = support(new_search_dir, A, B); // support in direction of origin
         num_dim++;
 
@@ -35,11 +31,13 @@ public:
             if (closest_point_to_simplex(a,b,c,d, new_search_dir,  num_dim)) {
                 // collision
                 vec3 normal;
+                float penetration;
                 vec3 p;
-                if (EPA(a, b, c, d, A, B, normal, p)) {
+                if (EPA(a, b, c, d, A, B, normal, penetration, p)) {
                     contact.p = p;
                     contact.n = normal;
-                    std::cout << "Collision collision!" << std::endl;
+                    contact.penetration = penetration;
+                    // std::cout << "Collision collision!" << std::endl;
                     return true;
                 } else {
                     return false;
@@ -51,9 +49,53 @@ public:
                 return false;
             }
         }
-
         return false;
+    }
 
+    static bool runWithCCD(const Shape &A, vec3 vel_a, const Shape &B, vec3 vel_b, Contact &contact) {
+        int CCD_STEPS = 3;
+        int GJK_MAXITR = 32;
+        vec3 a,b,c,d;
+        bool does_collide;
+
+        for(int steps = 0; steps < CCD_STEPS; steps++) {
+            does_collide = false;
+            vec3 new_search_dir = A.V.row(0).transpose() - B.V.row(0).transpose();
+            int num_dim = 0;
+            a = support(new_search_dir, A, B); // support in direction of origin
+            num_dim++;
+        
+            for (int iters = 0; iters < GJK_MAXITR; iters++) {
+                if (closest_point_to_simplex(a,b,c,d, new_search_dir,  num_dim)) {
+                    does_collide = true;
+                }
+                a = support(new_search_dir, A, B);
+                if (a.dot(new_search_dir) < 0) return false;
+                if(does_collide) break;
+            } 
+
+            if(!does_collide && steps == 0) return false; // Stop if original position doesn't collide
+
+            vel_a /= 2;
+            vel_b /= 2;
+            if(does_collide) { // Move half a step backward (still colliding)
+                A.V = A.V.rowwise() - vel_a.transpose();
+                B.V = B.V.rowwise() - vel_b.transpose();
+            } else { // Move half a step forward (not colliding anymore)
+                A.V = A.V.rowwise() + vel_a.transpose();
+                B.V = B.V.rowwise() + vel_b.transpose();
+            }
+        }
+        vec3 normal;
+        float penetration;
+        vec3 p;
+        if (EPA(a, b, c, d, A, B, normal, penetration, p)) { //EPA finds collision data
+            contact.p = p;
+            contact.n = normal;
+            contact.penetration = penetration;
+            return true;
+        }
+        return false;
     }
 
     static vec3 handle_line(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &num_dim) {
@@ -207,7 +249,7 @@ public:
 
 
 
-    static bool EPA(vec3 &a, vec3 &b, vec3 &c, vec3 &d, const Shape &A, const Shape &B, vec3 &normal, vec3 &contact_point){
+    static bool EPA(vec3 &a, vec3 &b, vec3 &c, vec3 &d, const Shape &A, const Shape &B, vec3 &normal, float &penetration, vec3 &contact_point){
         const int EPA_MAX_NUM_FACES = 64;
         const int EPA_MAX_NUM_LOOSE_EDGES = 32;
         const int EPA_MAX_NUM_ITERATIONS = 64;
@@ -243,6 +285,7 @@ public:
             if(p.dot(search_dir) - min_dist < EPSILON) {
                 //Convergence (new point is not significantly further from origin)
                 normal = -faces[closest_face][3].normalized();
+                penetration = p.dot(search_dir);
                 vec3 mtv = faces[closest_face][3]*p.dot(search_dir); //dot vertex with normal to resolve collision along normal!
                 vec3 arg_p = support(search_dir, A);
                 contact_point = arg_p; // arg_p should always be a point on our mesh //faces[closest_face][2]; // vertex + penetration*normal

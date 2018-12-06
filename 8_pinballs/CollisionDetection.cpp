@@ -3,6 +3,7 @@
 #include "CollisionDetectionHelper.h"
 #include "SAT.h"
 #include "gjk2.h"
+#include <algorithm> 
 
 
 inline bool isCollision(std::shared_ptr<BoundingObject> r1, std::shared_ptr<BoundingObject> r2) {
@@ -76,191 +77,198 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
 
 void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
     switch (narrowPhaseMethod) {
-    case 0: {
-        // exhaustive
-        // iterate through all pairs of possible collisions
-        for (auto overlap : m_overlappingBodys) {
-            std::vector<Contact> temp_contacts[2];
-            // compute intersection of a with b first and intersectino
-            // of b with a and store results in temp_contacts
-            for (int switcher = 0; switcher < 2; switcher++) {
-                auto a =
-                    m_objects[(!switcher) ? overlap.first
-                                            : overlap.second];
-                auto b =
-                    m_objects[(!switcher) ? overlap.second
-                                            : overlap.first];
+        case 0: {
+            // exhaustive
+            // iterate through all pairs of possible collisions
+            for (auto overlap : m_overlappingBodys) {
+                std::vector<Contact> temp_contacts[2];
+                // compute intersection of a with b first and intersectino
+                // of b with a and store results in temp_contacts
+                for (int switcher = 0; switcher < 2; switcher++) {
+                    auto a =
+                        m_objects[(!switcher) ? overlap.first
+                                                : overlap.second];
+                    auto b =
+                        m_objects[(!switcher) ? overlap.second
+                                                : overlap.first];
 
-                Eigen::MatrixXd Va, Vb;
-                Eigen::MatrixXi Fa, Fb;
-                a->getMesh(Va, Fa);
-                b->getMesh(Vb, Fb);
+                    Eigen::MatrixXd Va, Vb;
+                    Eigen::MatrixXi Fa, Fb;
+                    a->getMesh(Va, Fa);
+                    b->getMesh(Vb, Fb);
 
-                // iterate through all faces of first object
-                for (int face = 0; face < Fa.rows(); face++) {
-                    // iterate through all edges of given face
-                    for (size_t j = 0; j < 3; j++) {
-                        int start = Fa(face, j);
-                        int end = Fa(face, (j + 1) % 3);
+                    // iterate through all faces of first object
+                    for (int face = 0; face < Fa.rows(); face++) {
+                        // iterate through all edges of given face
+                        for (size_t j = 0; j < 3; j++) {
+                            int start = Fa(face, j);
+                            int end = Fa(face, (j + 1) % 3);
 
-                        // check if there is a collision
-                        ContactType ct = isColliding(
-                            Va.row(start), Va.row(end), Vb, Fb);
+                            // check if there is a collision
+                            ContactType ct = isColliding(
+                                Va.row(start), Va.row(end), Vb, Fb);
 
-                        // find collision and check for duplicates
-                        switch (ct) {
-                            case ContactType::VERTEXFACE: {
-                                auto ret = m_penetratingVertices.insert(
-                                    Fa(face, j));
-                                // if not already in set
-                                if (ret.second) {
-                                    Contact temp_col =
-                                        findVertexFaceCollision(
-                                            Va.row(Fa(face, j)), Vb,
-                                            Fb);
-                                    temp_col.a = a;
-                                    temp_col.b = b;
-                                    temp_col.type =
-                                        ContactType::VERTEXFACE;
-                                    temp_contacts[switcher].push_back(
-                                        temp_col);
+                            // find collision and check for duplicates
+                            switch (ct) {
+                                case ContactType::VERTEXFACE: {
+                                    auto ret = m_penetratingVertices.insert(
+                                        Fa(face, j));
+                                    // if not already in set
+                                    if (ret.second) {
+                                        Contact temp_col =
+                                            findVertexFaceCollision(
+                                                Va.row(Fa(face, j)), Vb,
+                                                Fb);
+                                        temp_col.a = a;
+                                        temp_col.b = b;
+                                        temp_col.type =
+                                            ContactType::VERTEXFACE;
+                                        temp_contacts[switcher].push_back(
+                                            temp_col);
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
-                            case ContactType::EDGEEDGE: {
-                                int orderedStart = std::min(start, end);
-                                int orderedEnd = std::max(start, end);
-                                auto ret = m_penetratingEdges.insert(
-                                    std::make_pair(orderedStart,
-                                                    orderedEnd));
-                                // if not already in set
-                                if (ret.second) {
-                                    Contact temp_col =
-                                        findEdgeEdgeCollision(
-                                            Va.row(orderedStart),
-                                            Va.row(orderedEnd), Vb, Fb);
-                                    temp_col.a = a;
-                                    temp_col.b = b;
-                                    temp_col.type =
-                                        ContactType::EDGEEDGE;
-                                    temp_contacts[switcher].push_back(
-                                        temp_col);
+                                case ContactType::EDGEEDGE: {
+                                    int orderedStart = std::min(start, end);
+                                    int orderedEnd = std::max(start, end);
+                                    auto ret = m_penetratingEdges.insert(
+                                        std::make_pair(orderedStart,
+                                                        orderedEnd));
+                                    // if not already in set
+                                    if (ret.second) {
+                                        Contact temp_col =
+                                            findEdgeEdgeCollision(
+                                                Va.row(orderedStart),
+                                                Va.row(orderedEnd), Vb, Fb);
+                                        temp_col.a = a;
+                                        temp_col.b = b;
+                                        temp_col.type =
+                                            ContactType::EDGEEDGE;
+                                        temp_contacts[switcher].push_back(
+                                            temp_col);
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
-                            case ContactType::NONE: {
-                                break;
+                                case ContactType::NONE: {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // look for vertexFace
-            bool found = false;
-            for (int i = 0; i < 2; i++) {
-                for (auto cont : temp_contacts[i]) {
-                    if (cont.type == ContactType::VERTEXFACE) {
-                        m_contacts.push_back(cont);
-                        found = true;
+                // look for vertexFace
+                bool found = false;
+                for (int i = 0; i < 2; i++) {
+                    for (auto cont : temp_contacts[i]) {
+                        if (cont.type == ContactType::VERTEXFACE) {
+                            m_contacts.push_back(cont);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
                         break;
                     }
                 }
                 if (found) {
-                    break;
+                    continue;
+                }
+
+                // take single edgeedge if possible
+                if (temp_contacts[0].size() > 0 &&
+                    temp_contacts[0].size() < temp_contacts[1].size()) {
+                    for (int i = 0; i < temp_contacts[0].size(); i++) {
+                        m_contacts.push_back(temp_contacts[0][i]);
+                    }
+                } else if (temp_contacts[1].size() > 0 &&
+                            temp_contacts[0].size() >
+                                temp_contacts[1].size()) {
+                    for (int i = 0; i < temp_contacts[1].size(); i++) {
+                        m_contacts.push_back(temp_contacts[1][i]);
+                    }
+                } else if (temp_contacts[0].size() > 0) {
+                    for (int i = 0; i < temp_contacts[0].size(); i++) {
+                        m_contacts.push_back(temp_contacts[0][i]);
+                    }
+                } else if (temp_contacts[1].size() > 0) {
+                    for (int i = 0; i < temp_contacts[1].size(); i++) {
+                        m_contacts.push_back(temp_contacts[1][i]);
+                    }
                 }
             }
-            if (found) {
-                continue;
-            }
-
-            // take single edgeedge if possible
-            if (temp_contacts[0].size() > 0 &&
-                temp_contacts[0].size() < temp_contacts[1].size()) {
-                for (int i = 0; i < temp_contacts[0].size(); i++) {
-                    m_contacts.push_back(temp_contacts[0][i]);
-                }
-            } else if (temp_contacts[1].size() > 0 &&
-                        temp_contacts[0].size() >
-                            temp_contacts[1].size()) {
-                for (int i = 0; i < temp_contacts[1].size(); i++) {
-                    m_contacts.push_back(temp_contacts[1][i]);
-                }
-            } else if (temp_contacts[0].size() > 0) {
-                for (int i = 0; i < temp_contacts[0].size(); i++) {
-                    m_contacts.push_back(temp_contacts[0][i]);
-                }
-            } else if (temp_contacts[1].size() > 0) {
-                for (int i = 0; i < temp_contacts[1].size(); i++) {
-                    m_contacts.push_back(temp_contacts[1][i]);
-                }
-            }
-        }
-        break;
-    }
-
-	case 1: {
-
-        for (auto overlap : m_overlappingBodys) {
-            auto obj1 = m_objects[overlap.first];
-            auto obj2 = m_objects[overlap.second];
-
-            Vertices V1;
-            Faces F1;
-            obj1->getMesh(V1, F1);
-
-            Vertices V2;
-            Faces F2;
-            obj2->getMesh(V2, F2);
-
-            Contact contact;
-            contact.a = obj1;
-            contact.b = obj2;
-
-            if (SAT::intersect(V1, F1, V2, F2, contact)) {
-                m_contacts.push_back(contact);
-            }
-        }
-		// TODO
-		break;
-	} 
-    case 2: {
-        for (auto overlap: m_overlappingBodys) {
-            auto obj1 = m_objects[overlap.first];
-            auto obj2 = m_objects[overlap.second];
-
-            Vertices V1;
-            Faces F1;
-            obj1->getMesh(V1, F1);
-            Shape A(V1, F1);
-
-            Vertices V2;
-            Faces F2;
-            obj2->getMesh(V2, F2);
-            Shape B(V2, F2);
-
-
-            Contact contact;
-            contact.a = obj1;
-            contact.b = obj2;
-
-
-            if (GJK::run(A, B, contact)) {
-                m_contacts.push_back(contact);
-            }
+            break;
         }
 
-    }
+        case 1: {
+
+            for (auto overlap : m_overlappingBodys) {
+                auto obj1 = m_objects[overlap.first];
+                auto obj2 = m_objects[overlap.second];
+
+                Vertices V1;
+                Faces F1;
+                obj1->getMesh(V1, F1);
+
+                Vertices V2;
+                Faces F2;
+                obj2->getMesh(V2, F2);
+
+                Contact contact;
+                contact.a = obj1;
+                contact.b = obj2;
+
+                if (SAT::intersect(V1, F1, V2, F2, contact)) {
+                    m_contacts.push_back(contact);
+                }
+            }
+            // TODO
+            break;
+        } 
+        case 2: {
+            for (auto overlap: m_overlappingBodys) {
+                auto obj1 = m_objects[overlap.first];
+                auto obj2 = m_objects[overlap.second];
+
+                Vertices V1;
+                Faces F1;
+                obj1->getMesh(V1, F1);
+                Shape A(V1, F1);
+
+                Vertices V2;
+                Faces F2;
+                obj2->getMesh(V2, F2);
+                Shape B(V2, F2);
+
+                Contact contact;
+                contact.a = obj1;
+                contact.b = obj2;
+                
+                bool CCD = false;
+
+                if(CCD) {
+                    if (GJK::runWithCCD(A, obj1->getLinearVelocity(), B, obj2->getLinearVelocity(), contact)) {
+                        m_contacts.push_back(contact);
+                    }
+                } else {
+                    if (GJK::run(A, B, contact)) {
+                        m_contacts.push_back(contact);
+                    }
+                }  
+            }
+        }
     }
 }
 
 void CollisionDetection::applyImpulse(double eps) {
     // compute impulse for all contacts
     for (auto contact : m_contacts) {
-        contact.a->printDebug("Before update");
-        contact.b->printDebug("Before update");
-        std::cout << "Contact normal:" << std::endl;
-        std::cout << contact.n << std::endl;
+        if(debug) {
+            contact.a->printDebug("Before update");
+            contact.b->printDebug("Before update");
+            std::cout << "Contact normal:" << std::endl;
+            std::cout << contact.n << std::endl;
+        }
         Eigen::Vector3d vrel_vec = contact.a->getVelocity(contact.p) -
                                    contact.b->getVelocity(contact.p);
         double vrel = contact.n.dot(vrel_vec);
@@ -283,8 +291,10 @@ void CollisionDetection::applyImpulse(double eps) {
                         .cross(rb));
 
         Eigen::Vector3d j = numerator / (t1 + t2 + t3 + t4);
-        Eigen::Vector3d force = j.dot(contact.n) * contact.n;
-        force *= 0.99;
+        Eigen::Vector3d force = (j.dot(contact.n) * contact.n);
+
+        bool isDynamicA = contact.a->getType() == ObjType::DYNAMIC;
+        bool isDynamicB = contact.a->getType() == ObjType::DYNAMIC;
 
         if (contact.a->getType() == ObjType::DYNAMIC) {
             contact.a->setLinearMomentum(contact.a->getLinearMomentum() + force);
@@ -296,8 +306,10 @@ void CollisionDetection::applyImpulse(double eps) {
             contact.b->setAngularMomentum(contact.b->getAngularMomentum() -  rb.cross(force));
         }
 
-        contact.a->printDebug("After update");
-        contact.b->printDebug("After update");
+        if (debug) {
+            contact.a->printDebug("After update");
+            contact.b->printDebug("After update");
+        }
         //Apply effects stored in RigidObjects eg.
         //play sound effect or increase score
         for(auto e : contact.a->getEffects()) e->apply();

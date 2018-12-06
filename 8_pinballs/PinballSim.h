@@ -50,10 +50,10 @@ public:
         p_table = std::make_shared<Table>();
         p_table->emplaceInto(&m_objects);
 
-        p_paddle_r = std::make_shared<Paddle>(sf::Keyboard::Key::Right, Eigen::Vector3d(1, -3.2, 5.7), true);
+        p_paddle_r = std::make_shared<Paddle>(p_table, sf::Keyboard::Key::Right, Eigen::Vector3d(1.3, 0, 6.2), true);
         m_objects.emplace_back(p_paddle_r); // Right paddle
 
-        p_paddle_l = std::make_shared<Paddle>(sf::Keyboard::Key::Left, Eigen::Vector3d(-1, -3.2, 5.7), false);
+        p_paddle_l = std::make_shared<Paddle>(p_table, sf::Keyboard::Key::Left, Eigen::Vector3d(-1.3, 0, 6.2), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
 
         bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.8,0,3), 0, false);
@@ -63,9 +63,7 @@ public:
         bmp_1->emplaceInto(&m_objects);
 
         guard_l = std::make_shared<Obstacle>(p_table, "guard", 4, Eigen::Vector3d(-3,0,5), 0, false);
-        guard_l->printDebug();
         guard_l->emplaceInto(&m_objects);
-        guard_l->printDebug();
 
         score = std::make_shared<Score>(Eigen::Vector3d(5.75, 4, -4), 8);
         score->emplaceInto(&m_objects); //Add all objects related to the visual score
@@ -85,11 +83,9 @@ public:
 
         p_table->resetTable();
 
-        //p_table->setType(ObjType::STATIC);
-        p_ball->setScale(0.005);
-        p_ball->setPosition(Eigen::Vector3d(-3.5, 0.7, -1.2));
+        p_ball->setScale(0.008);
+        p_ball->setPosition(Eigen::Vector3d(-1, 0, 0));
         p_ball->setMass(1);
-
         Eigen::MatrixXd color(1, 3);
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
         p_ball->setColors(color);

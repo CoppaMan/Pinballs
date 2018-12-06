@@ -190,6 +190,8 @@ class CollisionDetection {
 
     // computed contact points
     std::vector<Contact> m_contacts;
+
+    bool debug = false;
 };
 
 #endif
