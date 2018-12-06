@@ -37,7 +37,7 @@ public:
                     contact.p = p;
                     contact.n = normal;
                     contact.penetration = penetration;
-                    // std::cout << "Collision collision!" << std::endl;
+                    std::cout << "Collision" << std::endl;
                     return true;
                 } else {
                     return false;
@@ -55,12 +55,13 @@ public:
     static bool runWithCCD(const Shape &A, vec3 vel_a, const Shape &B, vec3 vel_b, Contact &contact) {
         int CCD_STEPS = 3;
         int GJK_MAXITR = 32;
-        vec3 a,b,c,d;
+        vec3 a_b, b_b, c_b, d_b;
         bool does_collide;
 
         for(int steps = 0; steps < CCD_STEPS; steps++) {
             does_collide = false;
             vec3 new_search_dir = A.V.row(0).transpose() - B.V.row(0).transpose();
+            vec3 a,b,c,d;
             int num_dim = 0;
             a = support(new_search_dir, A, B); // support in direction of origin
             num_dim++;
@@ -70,18 +71,25 @@ public:
                     does_collide = true;
                 }
                 a = support(new_search_dir, A, B);
-                if (a.dot(new_search_dir) < 0) return false;
+                if (a.dot(new_search_dir) < 0) break;
                 if(does_collide) break;
             } 
 
-            if(!does_collide && steps == 0) return false; // Stop if original position doesn't collide
+            if(!does_collide && steps == 0) {
+                std::cout << "No initial collision" << std::endl;
+                return false; // Stop if original position doesn't collide
+            }
 
+            std::cout << "CCD pass " << steps + 1 << " => ";
             vel_a /= 2;
             vel_b /= 2;
             if(does_collide) { // Move half a step backward (still colliding)
+                std::cout << "Collision" << std::endl;
+                a_b = a; b_b = b; c_b = c; d_b = d;
                 A.V = A.V.rowwise() - vel_a.transpose();
                 B.V = B.V.rowwise() - vel_b.transpose();
             } else { // Move half a step forward (not colliding anymore)
+                std::cout << "No collision" << std::endl;
                 A.V = A.V.rowwise() + vel_a.transpose();
                 B.V = B.V.rowwise() + vel_b.transpose();
             }
@@ -89,7 +97,7 @@ public:
         vec3 normal;
         float penetration;
         vec3 p;
-        if (EPA(a, b, c, d, A, B, normal, penetration, p)) { //EPA finds collision data
+        if (EPA(a_b, b_b, c_b, d_b, A, B, normal, penetration, p)) { //EPA finds collision data
             contact.p = p;
             contact.n = normal;
             contact.penetration = penetration;
