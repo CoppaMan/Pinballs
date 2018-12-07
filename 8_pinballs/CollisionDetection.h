@@ -153,7 +153,7 @@ class CollisionDetection {
         return ret;
     }
 
-	void computeNarrowPhase(int narrowPhaseMethod);
+	void computeNarrowPhase(int narrowPhaseMethod, double timeDelta);
 
 	void applyImpulse(double eps = 1.0);
 
@@ -164,14 +164,13 @@ class CollisionDetection {
         m_contacts.clear();
     }
 
-    void computeCollisionDetection(int broadPhaseMethod = 0,
-                                   int narrowPhaseMethod = 0,
+    void computeCollisionDetection(double timeDelta, int broadPhaseMethod = 0, int narrowPhaseMethod = 0,
                                    double eps = 1.0) {
         clearDataStructures();
 
         computeBroadPhase(broadPhaseMethod);
 
-        computeNarrowPhase(narrowPhaseMethod);
+        computeNarrowPhase(narrowPhaseMethod, timeDelta);
 
         applyImpulse(eps);
     }

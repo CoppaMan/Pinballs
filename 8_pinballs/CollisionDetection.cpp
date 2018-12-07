@@ -75,7 +75,7 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
 
 
 
-void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
+void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, double timeDelta) {
     switch (narrowPhaseMethod) {
         case 0: {
             // exhaustive
@@ -247,7 +247,7 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod) {
                 bool CCD = false;
 
                 if(CCD) {
-                    if (GJK::runWithCCD(A, obj1->getLinearVelocity(), B, obj2->getLinearVelocity(), contact)) {
+                    if (GJK::runWithCCD(A, obj1->getLinearVelocity()*timeDelta, B, obj2->getLinearVelocity()*timeDelta, contact)) {
                         m_contacts.push_back(contact);
                     }
                 } else {

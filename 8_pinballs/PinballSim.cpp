@@ -3,7 +3,7 @@
 bool PinballSim::advance() {
 
     // compute the collision detection
-    m_collisionDetection.computeCollisionDetection(1, 2, m_eps);
+    m_collisionDetection.computeCollisionDetection(m_dt, 1, 2, m_eps);
 
     // add gravity only to ball
     p_ball->applyForceToCOM(m_gravity);
