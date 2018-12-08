@@ -1,3 +1,5 @@
+#pragma once
+
 #include "RigidObject.h"
 #include "Table.h"
 #include "SFML/Window/Keyboard.hpp"

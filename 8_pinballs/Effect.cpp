@@ -4,6 +4,11 @@
 Effect::Effect(PinballSim* sim, double cooldown) : ps(sim), cooldown(cooldown) {
 }
 
+void Effect::addObject(std::shared_ptr<RigidObject> obj) {
+    parent = obj;
+    objectInit();
+}
+
 void Effect::apply() {
     if (timer.getElapsedTime().asSeconds() >= cooldown) {
         timer.restart();
@@ -14,3 +19,5 @@ void Effect::apply() {
 }
 
 void Effect::run() {return;}
+void Effect::updateEffect() {return;}
+void Effect::objectInit() {return;}

@@ -35,9 +35,12 @@ void Table::emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj) {
 }
 
 void Table::resetTable() {
+    Eigen::MatrixXd col(1,3);
+    col << 0.3 , 0.3 , 0.3;
     for(auto p : parts) {
         p->setScale(1);
         p->setPosition(pos);
         p->setRotation(rot);
+        p->setColors(col);
     }
 }

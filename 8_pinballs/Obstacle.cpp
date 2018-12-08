@@ -38,7 +38,10 @@ void Obstacle::resetObstacle() {
 
 void Obstacle::addEffect(std::shared_ptr<Effect> e) {
     std::cout << "Adding effect " << std::endl;
-    for(auto p : parts) p->addEffect(e);
+    for(auto p : parts) {
+        p->addEffect(e);
+        e->addObject(p);
+    }
 }
 
 void Obstacle::printDebug() {

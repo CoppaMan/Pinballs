@@ -5,6 +5,8 @@
 #include "../8_pinballs/Effect.h"
 #include "BoundingObject.h"
 
+class Effect;
+
 /*
  * Base class representing a simple rigid object.
  */

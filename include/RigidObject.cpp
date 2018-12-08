@@ -87,12 +87,13 @@ void RigidObject::setInertia(const Eigen::Matrix3d& I) {
 
 void RigidObject::setLinearMomentum(const Eigen::Vector3d& p) {
     if (m_type == ObjType::STATIC) m_v.setZero();
+    if (m_type == ObjType::INTANGIBLE) m_v.setZero();
     if (m_type == ObjType::DYNAMIC) m_v = m_massInv * p;
 }
 
 void RigidObject::setAngularMomentum(const Eigen::Vector3d& l) {
     if (m_type == ObjType::STATIC) m_w.setZero();
-    if (m_type == ObjType::INTANGIBLE) return;
+    if (m_type == ObjType::INTANGIBLE) m_w.setZero();
     if (m_type == ObjType::ROTATION_ONLY or m_type == ObjType::DYNAMIC) m_w = getInertiaInvWorld() * l;
 }
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <igl/edges.h>
 #include "Simulation.h"
 #include "Table.h"
@@ -7,8 +9,9 @@
 #include "Score.h"
 #include "Obstacle.h"
 #include "ScoreEffect.h"
+#include "ColorEffect.h"
 
-//Import settings from blender:
+//Import settings for blender:
 //Forward is +X
 //Up is +Y
 
@@ -39,9 +42,11 @@ public:
     std::shared_ptr<Obstacle> bmp_1;
 
     std::shared_ptr<ScoreEffect> add250points;
+    std::shared_ptr<ColorEffect> blinkWhite;
 
     virtual void init() override {
         add250points = std::make_shared<ScoreEffect>(this, 250);
+        blinkWhite = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,1.0,1.0), Fade::LINEAR, 1.0);
 
         m_objects.clear();
         p_ball = std::make_shared<Ball>();
@@ -84,7 +89,7 @@ public:
         p_table->resetTable();
 
         p_ball->setScale(0.008);
-        p_ball->setPosition(Eigen::Vector3d(-1, 0, 0));
+        p_ball->setPosition(Eigen::Vector3d(-1.8, 0, 0));
         p_ball->setMass(1);
         Eigen::MatrixXd color(1, 3);
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
@@ -92,9 +97,13 @@ public:
 
         p_paddle_r->reset_paddle(); //resets the paddle state
         p_paddle_l->reset_paddle();
+
         guard_l->resetObstacle();
+
         bmp_0->resetObstacle();
         bmp_0->addEffect(add250points);
+        bmp_0->addEffect(blinkWhite);
+
         bmp_1->resetObstacle();
         bmp_1->addEffect(add250points);
         score->resetScore();
