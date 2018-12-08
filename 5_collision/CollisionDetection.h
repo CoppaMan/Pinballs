@@ -18,6 +18,8 @@ struct Contact {
     Eigen::Vector3d ea;  // edge direction for A
     Eigen::Vector3d eb;  // edge direction for B
 
+    float penetration; // negative for seperating objects
+
     ContactType type;  // type of contact
 };
 
@@ -134,7 +136,7 @@ class CollisionDetection {
         return ret;
     }
 
-	void computeNarrowPhase(int narrowPhaseMethod);
+	void computeNarrowPhase(int narrowPhaseMethod, float &m_dt);
 
 	void applyImpulse(double eps = 1.0);
 
@@ -145,14 +147,17 @@ class CollisionDetection {
         m_contacts.clear();
     }
 
-    void computeCollisionDetection(int broadPhaseMethod = 0,
+    bool isTableCollision(std::shared_ptr<RigidObject> obj1, std::shared_ptr<RigidObject> obj2, Contact &contact);
+
+    void computeCollisionDetection(float &m_dt,
+                                    int broadPhaseMethod = 0,
                                    int narrowPhaseMethod = 0,
                                    double eps = 1.0) {
         clearDataStructures();
 
         computeBroadPhase(broadPhaseMethod);
 
-        computeNarrowPhase(narrowPhaseMethod);
+        computeNarrowPhase(narrowPhaseMethod, m_dt);
 
         applyImpulse(eps);
     }

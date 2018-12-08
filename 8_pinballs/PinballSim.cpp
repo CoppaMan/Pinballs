@@ -3,6 +3,7 @@
 bool PinballSim::advance() {
 
     // compute the collision detection
+    float mt_old = m_dt;
     m_collisionDetection.computeCollisionDetection(m_dt, 1, 2, m_eps);
 
     // add gravity only to ball
@@ -41,8 +42,18 @@ bool PinballSim::advance() {
     }
 
 
+    // check if ball is under table and if yes move along the normal to get out of there
+    Contact coni;
+    if (m_collisionDetection.isTableCollision(p_ball, p_table->m_table_surface, coni)) {
+        // if everything went smoothly we should not be here
+        p_ball->setPosition(p_ball->getPosition() + coni.n * coni.penetration);
+    }
+
     m_time += m_dt;
     m_step++;
+
+    m_dt = mt_old;
+
 
     return false;
 }

@@ -74,129 +74,64 @@ void CollisionDetection::computeBroadPhase(int broadPhaseMethod) {
 }
 
 
+bool isTableCollision2(Shape &ball, Shape &table, vec3 table_normal, Contact &contact) {
+    // ball
+    vec3 mb = ball.V.colwise().minCoeff();
+    vec3 Mb = ball.V.colwise().maxCoeff();
 
-void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, double timeDelta) {
+    vec3 center = (mb + Mb) /2;
+    double radius = (ball.V.row(0).transpose() - center).norm();
+
+    vec3 Q = table.V.row(0).transpose();
+
+    double distance_to_plane = fabs((Q - center).dot(table_normal));
+    vec3 collisionPoint =  center - table_normal*distance_to_plane;
+
+    contact.n = table_normal;
+    contact.p = collisionPoint;
+    contact.penetration = radius - distance_to_plane;
+
+    if (distance_to_plane < radius) {
+        return true;
+    }
+
+    return false;
+}
+
+bool CollisionDetection::isTableCollision(std::shared_ptr<RigidObject> obj1, std::shared_ptr<RigidObject> obj2, Contact &contact) {
+    if (!obj2->isTable()) {
+        return false;
+    }
+    vec3 table_normal = obj2->getRotationMatrix()*vec3(0,1,0);
+
+    Vertices V1;
+    Faces F1;
+    obj1->getMesh(V1, F1);
+    Shape A(V1, F1);
+
+    Vertices V2;
+    Faces F2;
+    obj2->getMesh(V2, F2);
+    Shape B(V2, F2);
+
+    return isTableCollision2(A, B, table_normal, contact);
+
+}
+
+bool isTableContinuous(std::shared_ptr<RigidObject> obj1, std::shared_ptr<RigidObject> obj2, Contact &contact) {
+    double tmin = 0;
+    double tmax = 1;
+
+    double best_t = 2;
+    while (tmin <= tmax) {
+
+    }
+}
+
+void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, float &timeDelta) {
     switch (narrowPhaseMethod) {
         case 0: {
-            // exhaustive
-            // iterate through all pairs of possible collisions
-            for (auto overlap : m_overlappingBodys) {
-                std::vector<Contact> temp_contacts[2];
-                // compute intersection of a with b first and intersectino
-                // of b with a and store results in temp_contacts
-                for (int switcher = 0; switcher < 2; switcher++) {
-                    auto a =
-                        m_objects[(!switcher) ? overlap.first
-                                                : overlap.second];
-                    auto b =
-                        m_objects[(!switcher) ? overlap.second
-                                                : overlap.first];
-
-                    Eigen::MatrixXd Va, Vb;
-                    Eigen::MatrixXi Fa, Fb;
-                    a->getMesh(Va, Fa);
-                    b->getMesh(Vb, Fb);
-
-                    // iterate through all faces of first object
-                    for (int face = 0; face < Fa.rows(); face++) {
-                        // iterate through all edges of given face
-                        for (size_t j = 0; j < 3; j++) {
-                            int start = Fa(face, j);
-                            int end = Fa(face, (j + 1) % 3);
-
-                            // check if there is a collision
-                            ContactType ct = isColliding(
-                                Va.row(start), Va.row(end), Vb, Fb);
-
-                            // find collision and check for duplicates
-                            switch (ct) {
-                                case ContactType::VERTEXFACE: {
-                                    auto ret = m_penetratingVertices.insert(
-                                        Fa(face, j));
-                                    // if not already in set
-                                    if (ret.second) {
-                                        Contact temp_col =
-                                            findVertexFaceCollision(
-                                                Va.row(Fa(face, j)), Vb,
-                                                Fb);
-                                        temp_col.a = a;
-                                        temp_col.b = b;
-                                        temp_col.type =
-                                            ContactType::VERTEXFACE;
-                                        temp_contacts[switcher].push_back(
-                                            temp_col);
-                                    }
-                                    break;
-                                }
-                                case ContactType::EDGEEDGE: {
-                                    int orderedStart = std::min(start, end);
-                                    int orderedEnd = std::max(start, end);
-                                    auto ret = m_penetratingEdges.insert(
-                                        std::make_pair(orderedStart,
-                                                        orderedEnd));
-                                    // if not already in set
-                                    if (ret.second) {
-                                        Contact temp_col =
-                                            findEdgeEdgeCollision(
-                                                Va.row(orderedStart),
-                                                Va.row(orderedEnd), Vb, Fb);
-                                        temp_col.a = a;
-                                        temp_col.b = b;
-                                        temp_col.type =
-                                            ContactType::EDGEEDGE;
-                                        temp_contacts[switcher].push_back(
-                                            temp_col);
-                                    }
-                                    break;
-                                }
-                                case ContactType::NONE: {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // look for vertexFace
-                bool found = false;
-                for (int i = 0; i < 2; i++) {
-                    for (auto cont : temp_contacts[i]) {
-                        if (cont.type == ContactType::VERTEXFACE) {
-                            m_contacts.push_back(cont);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        break;
-                    }
-                }
-                if (found) {
-                    continue;
-                }
-
-                // take single edgeedge if possible
-                if (temp_contacts[0].size() > 0 &&
-                    temp_contacts[0].size() < temp_contacts[1].size()) {
-                    for (int i = 0; i < temp_contacts[0].size(); i++) {
-                        m_contacts.push_back(temp_contacts[0][i]);
-                    }
-                } else if (temp_contacts[1].size() > 0 &&
-                            temp_contacts[0].size() >
-                                temp_contacts[1].size()) {
-                    for (int i = 0; i < temp_contacts[1].size(); i++) {
-                        m_contacts.push_back(temp_contacts[1][i]);
-                    }
-                } else if (temp_contacts[0].size() > 0) {
-                    for (int i = 0; i < temp_contacts[0].size(); i++) {
-                        m_contacts.push_back(temp_contacts[0][i]);
-                    }
-                } else if (temp_contacts[1].size() > 0) {
-                    for (int i = 0; i < temp_contacts[1].size(); i++) {
-                        m_contacts.push_back(temp_contacts[1][i]);
-                    }
-                }
-            }
+        
             break;
         }
 
@@ -230,6 +165,12 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, double timeDe
                 auto obj1 = m_objects[overlap.first];
                 auto obj2 = m_objects[overlap.second];
 
+                bool isnotdynamic_1 = obj1->getType() != ObjType ::DYNAMIC;
+                bool isnotdynamic_2 = obj2->getType() != ObjType ::DYNAMIC;
+
+                if (isnotdynamic_1 && isnotdynamic_2)
+                    continue;
+
                 Vertices V1;
                 Faces F1;
                 obj1->getMesh(V1, F1);
@@ -243,6 +184,13 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, double timeDe
                 Contact contact;
                 contact.a = obj1;
                 contact.b = obj2;
+
+                if (obj2->isTable()) {
+                    if (isTableCollision(obj1, obj2, contact)) {
+                        m_contacts.push_back(contact);
+                    }
+                    continue;
+                }
                 
                 bool CCD = false;
 

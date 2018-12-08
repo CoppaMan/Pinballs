@@ -292,10 +292,13 @@ public:
 
             if(p.dot(search_dir) - min_dist < EPSILON) {
                 //Convergence (new point is not significantly further from origin)
-                normal = -faces[closest_face][3].normalized();
+                normal = -faces[closest_face][3];
                 penetration = p.dot(search_dir);
+
                 vec3 mtv = faces[closest_face][3]*p.dot(search_dir); //dot vertex with normal to resolve collision along normal!
                 vec3 arg_p = support(search_dir, A);
+
+                double test = (search_dir - arg_p).norm();
                 contact_point = arg_p; // arg_p should always be a point on our mesh //faces[closest_face][2]; // vertex + penetration*normal
                 return true;
             }

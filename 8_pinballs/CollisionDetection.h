@@ -153,7 +153,9 @@ class CollisionDetection {
         return ret;
     }
 
-	void computeNarrowPhase(int narrowPhaseMethod, double timeDelta);
+    bool isTableCollision(std::shared_ptr<RigidObject> obj1, std::shared_ptr<RigidObject> obj2, Contact &contact);
+
+	void computeNarrowPhase(int narrowPhaseMethod, float &timeDelta);
 
 	void applyImpulse(double eps = 1.0);
 
@@ -164,7 +166,7 @@ class CollisionDetection {
         m_contacts.clear();
     }
 
-    void computeCollisionDetection(double timeDelta, int broadPhaseMethod = 0, int narrowPhaseMethod = 0,
+    void computeCollisionDetection(float &timeDelta, int broadPhaseMethod = 0, int narrowPhaseMethod = 0,
                                    double eps = 1.0) {
         clearDataStructures();
 
