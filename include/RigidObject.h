@@ -13,7 +13,8 @@ class RigidObject : public BaseObject {
     RigidObject();
     RigidObject(const std::string& mesh_path,
                 const ObjType t = ObjType::DYNAMIC,
-                BOUNDING_TYPE bounding_Type = BOUNDING_TYPE::BOX);
+                BOUNDING_TYPE bounding_Type = BOUNDING_TYPE::BOX,
+                bool isTable = false);
 
     void applyForceToCOM(const Eigen::Vector3d& f);
     /*
@@ -39,6 +40,10 @@ class RigidObject : public BaseObject {
     void resetForce();
     void resetTorque();
 
+    virtual bool isTable() {
+        return m_istable;
+    }
+
     virtual std::shared_ptr<BoundingObject> getBoundingObject() const;
     BOUNDING_TYPE getBoundingType() const;
     double getMass() const;
@@ -58,7 +63,7 @@ class RigidObject : public BaseObject {
 
    protected:
     virtual void resetMembers() override;
-
+    bool m_istable;
    private:
     double m_mass;                 // Body mass
     double m_massInv;              // Inverted mass

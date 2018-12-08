@@ -3,7 +3,8 @@
 
 RigidObject::RigidObject() {}
 
-RigidObject::RigidObject(const std::string& mesh_file, const ObjType t, BOUNDING_TYPE bounding_Type) : m_bounding_type(bounding_Type) {
+RigidObject::RigidObject(const std::string& mesh_file, const ObjType t, BOUNDING_TYPE bounding_Type, bool istable) :
+                m_bounding_type(bounding_Type), m_istable(istable) {
     findAndLoadMesh(mesh_file);
     setType(t);
     setMass(1.0);

@@ -9,7 +9,9 @@ Table::Table() {
                 0, std::sin(theta), std::cos(theta);
     rot = tilt;
 
-    parts.emplace_back(std::make_shared<RigidObject>("table_surface.off", ObjType::STATIC));
+    m_table_surface =
+            std::make_shared<RigidObject>("table_surface.off", ObjType::STATIC, BOUNDING_TYPE ::BOX, true);
+    parts.push_back(m_table_surface);
 
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_l.off", ObjType::STATIC));
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_r.off", ObjType::STATIC));
