@@ -10,6 +10,7 @@
 #include "Obstacle.h"
 #include "ScoreEffect.h"
 #include "ColorEffect.h"
+#include "SoundEffect.h"
 
 //Import settings for blender:
 //Forward is +X
@@ -43,10 +44,12 @@ public:
 
     std::shared_ptr<ScoreEffect> add250points;
     std::shared_ptr<ColorEffect> blinkWhite;
+    std::shared_ptr<SoundEffect> bounce;
 
     virtual void init() override {
         add250points = std::make_shared<ScoreEffect>(this, 250);
         blinkWhite = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,1.0,1.0), Fade::LINEAR, 1.0);
+        //bounce = std::make_shared<SoundEffect>(this, "glass.ogg");
 
         m_objects.clear();
         p_ball = std::make_shared<Ball>();
@@ -103,6 +106,7 @@ public:
         bmp_0->resetObstacle();
         bmp_0->addEffect(add250points);
         bmp_0->addEffect(blinkWhite);
+        //bmp_0->addEffect(bounce);
 
         bmp_1->resetObstacle();
         bmp_1->addEffect(add250points);

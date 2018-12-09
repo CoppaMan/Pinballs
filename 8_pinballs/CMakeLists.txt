@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(8_pinballs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
-set(CMAKE_CXX_FLAGS "-Wall -lsfml-graphics -lsfml-window -lsfml-system")
+set(CMAKE_CXX_FLAGS "-Wall -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio")
 
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY "Use libigl as static library" OFF)
