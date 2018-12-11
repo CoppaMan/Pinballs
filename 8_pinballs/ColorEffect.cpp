@@ -9,7 +9,7 @@ Effect(sim, 0.5), fadeType(fadeType), duration(duration) {
     targetColor << targetCol(0), targetCol(1), targetCol(2);
 }
 
-void ColorEffect::run() {
+void ColorEffect::run(std::shared_ptr<RigidObject> other) {
     if(init) {
         timer.restart();
         init = false;

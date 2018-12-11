@@ -20,6 +20,10 @@ Table::Table() {
     parts.emplace_back(std::make_shared<RigidObject>("table_bottom_r.off", ObjType::STATIC));
 
     parts.emplace_back(std::make_shared<RigidObject>("table_seperator.off", ObjType::STATIC));
+
+    parts.emplace_back(std::make_shared<RigidObject>("table_top_l.off", ObjType::STATIC));
+    parts.emplace_back(std::make_shared<RigidObject>("table_top_m.off", ObjType::STATIC));
+    parts.emplace_back(std::make_shared<RigidObject>("table_top_r.off", ObjType::STATIC));
 }
 
 Eigen::Vector3d Table::getPosition() {

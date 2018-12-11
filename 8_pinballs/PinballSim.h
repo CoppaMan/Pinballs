@@ -11,6 +11,7 @@
 #include "ScoreEffect.h"
 #include "ColorEffect.h"
 #include "SoundEffect.h"
+#include "ForceEffect.h"
 
 //Import settings for blender:
 //Forward is +X
@@ -31,6 +32,8 @@ public:
     // CONFIGS
     float m_dt = 1e-2;
     Eigen::Vector3d m_gravity;
+    int springStrength = 10;
+    std::shared_ptr<Eigen::Vector3d> spring;
 
     // SCENE OBJECS
     std::shared_ptr<Table> p_table;
@@ -41,15 +44,17 @@ public:
     std::shared_ptr<Score> score;
     std::shared_ptr<Obstacle> bmp_0;
     std::shared_ptr<Obstacle> bmp_1;
+    std::shared_ptr<Obstacle> bounce;
 
     std::shared_ptr<ScoreEffect> add250points;
     std::shared_ptr<ColorEffect> blinkWhite;
-    std::shared_ptr<SoundEffect> bounce;
+    std::shared_ptr<ForceEffect> launch;
 
     virtual void init() override {
+
+        //Effects
         add250points = std::make_shared<ScoreEffect>(this, 250);
         blinkWhite = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,1.0,1.0), Fade::LINEAR, 1.0);
-        //bounce = std::make_shared<SoundEffect>(this, "glass.ogg");
 
         m_objects.clear();
         p_ball = std::make_shared<Ball>();
@@ -64,14 +69,17 @@ public:
         p_paddle_l = std::make_shared<Paddle>(p_table, sf::Keyboard::Key::Left, Eigen::Vector3d(-1.3, 0, 6.2), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
 
-        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.8,0,3), 0, false);
+        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.8,0,3), Eigen::Vector3d(0, 0.4, 1), 0, false);
         bmp_0->emplaceInto(&m_objects);
 
-        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,2), 0, false);
+        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,2), Eigen::Vector3d(0, 1, 0.4), 0, false);
         bmp_1->emplaceInto(&m_objects);
 
-        guard_l = std::make_shared<Obstacle>(p_table, "guard", 4, Eigen::Vector3d(-3,0,5), 0, false);
+        guard_l = std::make_shared<Obstacle>(p_table, "guard", 4, Eigen::Vector3d(-3,0,5), Eigen::Vector3d(1, 1, 1), 0, false);
         guard_l->emplaceInto(&m_objects);
+
+        bounce = std::make_shared<Obstacle>(p_table, "bounce", 1, Eigen::Vector3d(4.7,0,5.5), Eigen::Vector3d(1, 0.4, 0.4), 0, false);
+        bounce->emplaceInto(&m_objects);
 
         score = std::make_shared<Score>(Eigen::Vector3d(5.75, 4, -4), 8);
         score->emplaceInto(&m_objects); //Add all objects related to the visual score
@@ -92,7 +100,7 @@ public:
         p_table->resetTable();
 
         p_ball->setScale(0.008);
-        p_ball->setPosition(Eigen::Vector3d(-1.8, 0, 0));
+        p_ball->setPosition(Eigen::Vector3d(4.7, -2.5, 4.5));
         p_ball->setMass(1);
         Eigen::MatrixXd color(1, 3);
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
@@ -106,10 +114,15 @@ public:
         bmp_0->resetObstacle();
         bmp_0->addEffect(add250points);
         bmp_0->addEffect(blinkWhite);
-        //bmp_0->addEffect(bounce);
 
         bmp_1->resetObstacle();
         bmp_1->addEffect(add250points);
+
+        bounce->resetObstacle();
+        Eigen::Vector3d spring(0, 0, -springStrength);
+        launch = std::make_shared<ForceEffect>(this, spring, true);
+        bounce->addEffect(launch);
+
         score->resetScore();
     }
 

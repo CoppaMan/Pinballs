@@ -1,7 +1,7 @@
 #include "Obstacle.h"
 #include <string>
 
-Obstacle::Obstacle(std::shared_ptr<Table> table, std::string name, int count, Eigen::Vector3d pos, double angle, bool mirror) : table(table), pos_rel(pos), rot_rel(angle), mirrored(mirror) {
+Obstacle::Obstacle(std::shared_ptr<Table> table, std::string name, int count, Eigen::Vector3d pos, Eigen::Vector3d color, double angle, bool mirror) : table(table), pos_rel(pos), color(color), rot_rel(angle), mirrored(mirror) {
     pos_abs = table->getPosition() + (table->getRotation()*pos_rel);
 
     Eigen::Matrix3d spin;
@@ -32,6 +32,9 @@ void Obstacle::emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj) {
 void Obstacle::resetObstacle() {
     for(auto p : parts) {
         p->setPosition(pos_abs);
+        Eigen::MatrixXd col(1,3);
+        col << color(0), color(1), color(2);
+        p->setColors(col);
         p->setRotation(rot_abs);
     }
 }

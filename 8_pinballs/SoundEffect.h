@@ -7,7 +7,7 @@
 class SoundEffect : public Effect {
     public:
         SoundEffect(PinballSim *sim, std::string name);
-        void run();
+        void run(std::shared_ptr<RigidObject> other);
     private:
         std::string path;
         sf::SoundBuffer buffer;

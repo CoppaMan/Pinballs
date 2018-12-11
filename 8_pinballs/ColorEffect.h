@@ -7,7 +7,7 @@ enum Fade {CONSTANT, LINEAR};
 class ColorEffect : public Effect {
     public:
         ColorEffect(PinballSim *sim, Eigen::Vector3d targetCol, Fade fadeType, double duration);
-        void run();
+        void run(std::shared_ptr<RigidObject> other);
         void objectInit();
         void updateEffect();
     private:

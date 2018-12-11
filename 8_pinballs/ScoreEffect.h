@@ -5,7 +5,7 @@
 class ScoreEffect : public Effect {
     public:
         ScoreEffect(PinballSim *sim, long new_v);
-        void run();
+        void run(std::shared_ptr<RigidObject> other);
     private:
         long value;
 };

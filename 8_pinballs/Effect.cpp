@@ -9,15 +9,15 @@ void Effect::addObject(std::shared_ptr<RigidObject> obj) {
     objectInit();
 }
 
-void Effect::apply() {
+void Effect::apply(std::shared_ptr<RigidObject> other) {
     if (timer.getElapsedTime().asSeconds() >= cooldown) {
         timer.restart();
-        run();
+        run(other);
     } else {
         std::cout << "Too early" << std::endl;
     }
 }
 
-void Effect::run() {return;}
+void Effect::run(std::shared_ptr<RigidObject> other) {return;}
 void Effect::updateEffect() {return;}
 void Effect::objectInit() {return;}

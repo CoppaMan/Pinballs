@@ -7,7 +7,7 @@
 
 class Obstacle {
     public:
-        Obstacle(std::shared_ptr<Table> table, std::string name, int count, Eigen::Vector3d pos, double angle, bool mirror);
+        Obstacle(std::shared_ptr<Table> table, std::string name, int count, Eigen::Vector3d pos, Eigen::Vector3d color, double angle, bool mirror);
         void emplaceInto(std::vector<std::shared_ptr<RigidObject>> *m_obj);
         void resetObstacle();
         void addEffect(std::shared_ptr<Effect> effect);
@@ -21,4 +21,5 @@ class Obstacle {
         double rot_rel;
         Eigen::Matrix3d rot_abs;
         bool mirrored;
+        Eigen::Vector3d color;
 };
