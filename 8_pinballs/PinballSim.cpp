@@ -6,6 +6,17 @@ bool PinballSim::advance() {
     float mt_old = m_dt;
     m_collisionDetection.computeCollisionDetection(m_dt, 1, 2, m_eps);
 
+    if (p_ball->getPosition()(1) < -5 && ballOnTable) {
+        balls--;
+        ballOnTable = false;
+    }
+
+    if(!ballOnTable && balls > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+        p_ball->reset();
+        p_ball->setPosition(Eigen::Vector3d(4.7, -2.5, 4.5));
+        ballOnTable = true;
+    }
+
     // add gravity only to ball
     p_ball->applyForceToCOM(m_gravity);
 

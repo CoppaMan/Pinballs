@@ -33,6 +33,10 @@ public:
     float m_dt = 1e-2;
     Eigen::Vector3d m_gravity;
     int springStrength = 10;
+
+    bool ballOnTable = false;
+    int balls = 3;
+
     std::shared_ptr<Eigen::Vector3d> spring;
 
     // SCENE OBJECS
@@ -100,7 +104,7 @@ public:
         p_table->resetTable();
 
         p_ball->setScale(0.008);
-        p_ball->setPosition(Eigen::Vector3d(4.7, -2.5, 4.5));
+        p_ball->setPosition(Eigen::Vector3d(0, -10, 0));
         p_ball->setMass(1);
         Eigen::MatrixXd color(1, 3);
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
