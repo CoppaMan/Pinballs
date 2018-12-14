@@ -1,108 +1,27 @@
-# Physically-based Simulation 2018 - Course Exercises
+# Physically-based Simulation 2018 - Project of Pinballs
 
-## News and Changes
+## Disclamer
+This project is build upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next section was implemented by Simon Huber and Dario Morandini.
 
-23.10.2018 - Added Exercise 5. The framework for this exercise is different from previous one, so run one of _generateBuild*_ files in `7_fluid` directory according to your OS.
+## Implemented functionality
 
-15.10.2018 - Added Exercise 4.
+### Effects
+The Effect class presents a general interface to change the behaviour of colliding objects. It is called in **CollsionDetection::applyImpulse()** and can be updated frame by frame in the **PinballSim::advance()** simulation loop. This allows for not only modifications during the collision frame but also during a short period after the initial collision. Effects also have a cooldown which describes a time during which the same effect cannot be triggered again. Effects know of their collision partner and can also change their properties.
 
-10.10.2018 - Added Exercise 3.
+- **GravityEffect**: Changes the gravity of the play field
+- **ScoreEffect**: Updates the score of the current game (for Score see [here](#score))
+- **SoundEffect**: Plays a sound clip after the collision, the cooldown timer makes sure to no play it too often in succession.
+- **ColorEffect**: Uses the update function to create either a linear or constant color fade effect.
+- **ForceEffect**: Does not change the linear momentum of the object attached to it but rather of its collision partner. Used for the launch of the ball
 
-03.10.2018 (17:35) - Added Exercise 2 with the task description.
+### Score
+The score is represented by both a natural number as well as an array of 7 segment displays made up of rigid bodies. The score consists of a variable number of **Digit**s. When **addScore()** is called it performs modular arithmetics to partition the decimal number into its digits. To prevent overflows the number of digits limits the highest score possible.
 
-25.09.2018 - Added Exercise 1. Please update your forked repository first.
+- **Segement**: A segment is a **RigidBody** with additional attributes to enable it (make it red) or disable it (make it black). It uses a new **ObjType** called **INTANGIBLE** to not check for collsions.
+- **Digit**: A digit is made up of 7 segments. Its main objective is to enable and disable the correct **segment**s to represent one decimal which is performed in **update_digit()**.
 
-19.09.2018 - Follow the instructions to update your private repository.
+### Obstacles
+Placing **RigidObject**s on a table which has rotation different from the identity matrix is cumbersome on its own. The **Obstacle** class takes a parent (in our case the **Table**) and orients the **RigidObject**s accordingly. Multiple **RigidObject**s can be added to one **Obstacle** by naming the meshes *obstacleName_number* where number starts a 0. Those meshes need to share a common origin.
 
-## Exercise Overview
-
-<!-- Not available yet. -->
-[Exercise 1: Time Integration](ex1.pdf)
-
-[Exercise 2: Rigid Body Rotation](ex2.pdf)
-
-[Exercise 3: Collision Handling](ex3.pdf)
-
-[Exercise 4: Mass-Spring System](ex4.pdf)
-
-[Exercise 5: Fluid Simulation](ex5.pdf)
-
-## Installation
-
-### Git and CMAKE
-Before we can begin, you must have Git running, a distributed revision control system which you need to handin your assignments as well as keeping track of your code changes. We refer you to the online [Pro Git book](https://git-scm.com/book/en/v2) for more information. There you will also find [instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git]) on how to to install it. On windows we suggest using [git for windows](https://git-for-windows.github.io/).
-
-CMake is the system this framework uses for cross-platform builds. If you are using Linux or macOS, I recommend installing it with a package manager instead of the CMake download page. E.g. on Debian/Ubuntu:
-```
-sudo apt-get install cmake
-```
-or with MacPorts on macOS:
-```
-sudo port install cmake.
-```
-On Windows you can download it from:
-[https://cmake.org/download/](https://cmake.org/download/)
-
-### Note for linux users
-
-Many linux distributions do not include `gcc` and the basic development tools in their default installation. On Ubuntu, you need to install the following packages:
-
-```
-sudo apt-get install build-essential
-sudo apt-get install libx11-dev
-sudo apt-get install mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
-sudo apt-get install libxrandr-dev
-sudo apt-get install libxi-dev
-sudo apt-get install libxmu-dev
-sudo apt-get install libblas-dev
-sudo apt-get install libxinerama-dev
-sudo apt-get install libxcursor-dev
-```
-
-If you are using linux with a virtual machine on Windows, it is recommended to use Visual Studio instead.
-
-### Note for Windows users
-
-`libigl` supports the Microsoft Visual Studio 2015 compiler and later, in 64bit mode. You can download them for free from [ETH-Microsoft webstore](https://e5.onthehub.com/WebStore/ProductsByMajorVersionList.aspx?cmi_cs=1&cmi_mnuMain=bdba23cf-e05e-e011-971f-0030487d8897&ws=5664fddb-836f-e011-971f-0030487d8897&vsro=8).
-
-
-### Cloning the Exercise Repository
-Before you are able to clone your private exercise repository, you need to have an active [Gitlabvis](https://gitlab.vis.ethz.ch/) account. Then you can [fork](https://docs.gitlab.com/ee/gitlab-basics/fork-project.html) this project to create your own private online repository.
-
-In the next step you need to clone it to your local hard drive:
-```
-git clone --recurse-submodules https://gitlab.vis.ethz.ch/'Your_Git_Username'/PBS18-Exercises.git
-```
-'Your_Git_Username' needs to be replaced accordingly. This can take a moment.
-
-Next, cd into the newly created folder, and run the following commands inside the relevant subfolder to setup the build folder:
-```
-cd PBS18-Exercises; mkdir build
-cd build
-cmake ..
-```
-On Windows use the CMAKE gui with the buttons Configure and Generate.
-
-Compile and run the executable, e.g. Ubuntu:
-```
-make && ./0_dummy/0_dummy
-```
-Or use your favorite IDE. In case of Visual Studio, you need to open ```build/PBS.sln``` file.
-
-To update your forked repository, check this page: [how-do-i-update-a-github-forked-repository](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository)
-
-Basically, you are required to add our repository as a remote to your own one:
-```
-git remote add upstream https://gitlab.vis.ethz.ch/cglphysics/PBS18-Exercises.git
-```
-Then, fetch updates from it:
-```
-git fetch upstream
-```
-Lastly, move to your `master` branch and merge updates into yours:
-```
-git checkout master
-git merge upstream/master
-```
-Run the first line only once for adding, and the following steps (cmake as well!) should be done again for new updates.
-
+### Paddle
+The paddle is a **RigidObject** which can be activated by a specified key press. If the key is not pressed, the paddle will return to its resting configuration. Like **Obstacle**s it is placed relative to the table. To catch the key event produced by SFML, a hook is placed in **PinballSim::advance()** with the **toggle()** method. By setting its angular momentum we can handle a **Paddle** collision like any other collision.
