@@ -1,7 +1,7 @@
 # Physically-based Simulation 2018 - Project of Pinballs
 
-## Disclamer
-This project is build upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next section was implemented by Simon Huber and Dario Morandini.
+## Disclaimer
+This project is built upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next section was implemented by Simon Huber and Dario Morandini.
 
 ## Implemented functionality
 
