@@ -32,7 +32,7 @@ public:
     }
 
     virtual void drawSimulationParameterMenu() override {
-        ImGui::SliderInt("Spring Strength", &p_sim->springStrength, 1, 20);
+        ImGui::SliderInt("Spring Strength", &p_sim->springStrength, 10, 30);
     }
 };
 

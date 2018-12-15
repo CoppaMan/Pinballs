@@ -11,4 +11,5 @@ class SoundEffect : public Effect {
     private:
         std::string path;
         sf::SoundBuffer buffer;
+        sf::Sound sound;
 };

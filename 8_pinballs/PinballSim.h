@@ -45,20 +45,30 @@ public:
     std::shared_ptr<Paddle> p_paddle_r;
     std::shared_ptr<Paddle> p_paddle_l;
     std::shared_ptr<Obstacle> guard_l;
+    std::shared_ptr<Obstacle> guard_r;
     std::shared_ptr<Score> score;
-    std::shared_ptr<Obstacle> bmp_0;
-    std::shared_ptr<Obstacle> bmp_1;
+    std::shared_ptr<Obstacle> bumpL;
+    std::shared_ptr<Obstacle> bumpT;
+    std::shared_ptr<Obstacle> bumpB;
+    std::shared_ptr<Obstacle> bumpR;
     std::shared_ptr<Obstacle> bounce;
 
     std::shared_ptr<ScoreEffect> add250points;
-    std::shared_ptr<ColorEffect> blinkWhite;
+    std::shared_ptr<ScoreEffect> add1000points;
+    std::shared_ptr<ColorEffect> blinkGreen, blinkBlue, blinkRed, blinkYellow;
     std::shared_ptr<ForceEffect> launch;
+    std::shared_ptr<SoundEffect> dampSound;
 
     virtual void init() override {
 
         //Effects
         add250points = std::make_shared<ScoreEffect>(this, 250);
-        blinkWhite = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,1.0,1.0), Fade::LINEAR, 1.0);
+        add1000points = std::make_shared<ScoreEffect>(this, 1000);
+        blinkBlue = std::make_shared<ColorEffect>(this, Eigen::Vector3d(0.0,0.0,1.0), Fade::LINEAR, 5.0);
+        blinkGreen = std::make_shared<ColorEffect>(this, Eigen::Vector3d(0.0,1.0,0.0), Fade::LINEAR, 2.0);
+        blinkRed = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,0.0,0.0), Fade::CONSTANT, 4.0);
+        blinkYellow = std::make_shared<ColorEffect>(this, Eigen::Vector3d(1.0,1.0,0.0), Fade::CONSTANT, 3.0);
+        dampSound = std::make_shared<SoundEffect>(this, "bump.ogg");
 
         m_objects.clear();
         p_ball = std::make_shared<Ball>();
@@ -73,14 +83,20 @@ public:
         p_paddle_l = std::make_shared<Paddle>(p_table, sf::Keyboard::Key::Left, Eigen::Vector3d(-1.3, 0, 6.2), false);
         m_objects.emplace_back(p_paddle_l); // Left paddle
 
-        bmp_0 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.8,0,3), Eigen::Vector3d(0, 0.4, 1), 0, false);
-        bmp_0->emplaceInto(&m_objects);
-
-        bmp_1 = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(1,0,2), Eigen::Vector3d(0, 1, 0.4), 0, false);
-        bmp_1->emplaceInto(&m_objects);
+        bumpL = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-3,0,-4), Eigen::Vector3d(0.4, 0.4, 1), 0, false);
+        bumpL->emplaceInto(&m_objects);
+        bumpT = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.5,0,-5.5), Eigen::Vector3d(0.4, 1, 0.4), 0, false);
+        bumpT->emplaceInto(&m_objects);
+        bumpB = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(-1.5,0,-2.5), Eigen::Vector3d(1, 0.4, 0.4), 0, false);
+        bumpB->emplaceInto(&m_objects);
+        bumpR = std::make_shared<Obstacle>(p_table, "bumper", 1, Eigen::Vector3d(0,0,-4), Eigen::Vector3d(1, 1, 0.4), 0, false);
+        bumpR->emplaceInto(&m_objects);
 
         guard_l = std::make_shared<Obstacle>(p_table, "guard", 4, Eigen::Vector3d(-3,0,5), Eigen::Vector3d(1, 1, 1), 0, false);
         guard_l->emplaceInto(&m_objects);
+
+        guard_r = std::make_shared<Obstacle>(p_table, "guard", 4, Eigen::Vector3d(3,0,5), Eigen::Vector3d(1, 1, 1), 0, true);
+        guard_r->emplaceInto(&m_objects);
 
         bounce = std::make_shared<Obstacle>(p_table, "bounce", 1, Eigen::Vector3d(4.7,0,5.5), Eigen::Vector3d(1, 0.4, 0.4), 0, false);
         bounce->emplaceInto(&m_objects);
@@ -114,13 +130,27 @@ public:
         p_paddle_l->reset_paddle();
 
         guard_l->resetObstacle();
+        guard_r->resetObstacle();
 
-        bmp_0->resetObstacle();
-        bmp_0->addEffect(add250points);
-        bmp_0->addEffect(blinkWhite);
+        bumpL->resetObstacle();
+        bumpL->addEffect(add1000points);
+        bumpL->addEffect(blinkBlue);
+        bumpL->addEffect(dampSound);
 
-        bmp_1->resetObstacle();
-        bmp_1->addEffect(add250points);
+        bumpT->resetObstacle();
+        bumpT->addEffect(add1000points);
+        bumpT->addEffect(blinkGreen);
+        bumpT->addEffect(dampSound);
+
+        bumpR->resetObstacle();
+        bumpR->addEffect(add1000points);
+        bumpR->addEffect(blinkYellow);
+        bumpR->addEffect(dampSound);
+
+        bumpB->resetObstacle();
+        bumpB->addEffect(add1000points);
+        bumpB->addEffect(blinkRed);
+        bumpB->addEffect(dampSound);
 
         bounce->resetObstacle();
         Eigen::Vector3d spring(0, 0, -springStrength);
