@@ -106,7 +106,7 @@ public:
 
         m_collisionDetection.setObjects(m_objects);
 
-        m_gravity << 0, -9.81, 0;
+        m_gravity << 0, -20000.81, 0;
 
         setTimestep(m_dt);
         reset();
@@ -116,12 +116,13 @@ public:
         for (auto &o : m_objects) {
             o->reset();
         }
+        balls = 3;
 
         p_table->resetTable();
 
-        p_ball->setScale(0.008);
+        p_ball->setScale(0.010);
         p_ball->setPosition(Eigen::Vector3d(0, -10, 0));
-        p_ball->setMass(1);
+        p_ball->setMass(80);
         Eigen::MatrixXd color(1, 3);
         color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
         p_ball->setColors(color);
@@ -178,6 +179,9 @@ public:
 
         for (size_t i = 0; i < m_objects.size(); i++) {
             auto o = m_objects[i];
+            if (!o->renderObject())
+                continue;
+
             if (o->getID() < 0) {
                 int new_id = 0;
                 if (i > 0) {

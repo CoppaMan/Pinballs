@@ -3,7 +3,7 @@
 Table::Table() {
     pos = Eigen::Vector3d::Zero();
     Eigen::Matrix3d tilt;
-    double theta = M_PI/6.0; // tilt table 30°
+    double theta = M_PI/12.0; // tilt table 30°
     tilt << 1, 0, 0,
                 0, std::cos(theta), -std::sin(theta),
                 0, std::sin(theta), std::cos(theta);
@@ -12,6 +12,7 @@ Table::Table() {
     m_table_surface =
             std::make_shared<RigidObject>("table_surface.off", ObjType::STATIC, BOUNDING_TYPE ::BOX, true);
     parts.push_back(m_table_surface);
+    
 
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_l.off", ObjType::STATIC));
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_r.off", ObjType::STATIC));
@@ -47,4 +48,5 @@ void Table::resetTable() {
         p->setRotation(rot);
         p->setColors(col);
     }
+  
 }

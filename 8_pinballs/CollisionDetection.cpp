@@ -114,6 +114,21 @@ bool CollisionDetection::isTableCollision(std::shared_ptr<RigidObject> obj1, std
     obj2->getMesh(V2, F2);
     Shape B(V2, F2);
 
+    Vertices Vroof;
+    Faces Froof;
+    vec3 old_pos = obj2->getPosition();
+    obj2->setPosition(old_pos + Eigen::Vector3d(0, 0.7, 0));
+    obj2->getMesh(Vroof, Froof);
+    Shape R(Vroof, Froof);
+    obj2->setPosition(old_pos);
+
+    vec3 roof_normal = -table_normal;
+    bool roof_collision = isTableCollision2(A, R, roof_normal, contact);
+    if (roof_collision) {
+        std::cout << "roof collision" << std::endl;
+        return true;
+    }
+
     return isTableCollision2(A, B, table_normal, contact);
 
 }
@@ -211,6 +226,13 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, float &timeDe
 void CollisionDetection::applyImpulse(double eps) {
     // compute impulse for all contacts
     for (auto contact : m_contacts) {
+
+        bool isNotDynamicA = contact.a->getType() != ObjType::DYNAMIC;
+        bool isNotDynamicB = contact.a->getType() != ObjType::DYNAMIC;
+        
+        if (isNotDynamicA && isNotDynamicB)
+            continue;
+
         if(debug) {
             contact.a->printDebug("Before update");
             contact.b->printDebug("Before update");
@@ -224,6 +246,8 @@ void CollisionDetection::applyImpulse(double eps) {
             // bodies are moving apart
             continue;
         }
+
+
 
         // TODO: compute impulse and update the following momentums
         Eigen::Vector3d numerator = -(1 + eps) * vrel_vec;
@@ -241,15 +265,31 @@ void CollisionDetection::applyImpulse(double eps) {
         Eigen::Vector3d j = numerator / (t1 + t2 + t3 + t4);
         Eigen::Vector3d force = (j.dot(contact.n) * contact.n);
 
-        bool isDynamicA = contact.a->getType() == ObjType::DYNAMIC;
-        bool isDynamicB = contact.a->getType() == ObjType::DYNAMIC;
+
+
+        vec3 tangent = (contact.n.cross(vrel_vec).cross(contact.n)).normalized();
+
 
         if (contact.a->getType() == ObjType::DYNAMIC) {
+            float mu = 0.42;
+            vec3 friction = mu*j.dot(-contact.n)*tangent;
+            force *= 0.9;
             contact.a->setLinearMomentum(contact.a->getLinearMomentum() + force);
             contact.a->setAngularMomentum(contact.a->getAngularMomentum() +  ra.cross(force));
+
+            float e = 0.9;
+            
+            float d = contact.a->getLinearMomentum().dot(contact.n);
+            float k = - ( 1 + e ) * d;
+            float j2 = k < 0 ? 0 : k;
+            contact.a->setLinearMomentum(contact.a->getLinearMomentum() + j2*contact.n);
+            
         }
 
         if (contact.b->getType() == ObjType::DYNAMIC) {
+            float mu = 0.42;
+            vec3 friction = mu*j.dot(contact.n)*tangent;
+            //force += friction;
             contact.b->setLinearMomentum(contact.b->getLinearMomentum() - force);
             contact.b->setAngularMomentum(contact.b->getAngularMomentum() -  rb.cross(force));
         }

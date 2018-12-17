@@ -46,6 +46,10 @@ class RigidObject : public BaseObject {
         return m_istable;
     }
 
+    virtual bool renderObject() {
+        return true;
+    }
+
     virtual std::shared_ptr<BoundingObject> getBoundingObject() const;
     BOUNDING_TYPE getBoundingType() const;
     double getMass() const;
@@ -56,7 +60,7 @@ class RigidObject : public BaseObject {
     Eigen::Matrix3d getInertiaWorld() const;
     Eigen::Vector3d getLinearMomentum() const;
     Eigen::Vector3d getAngularMomentum() const;
-    Eigen::Vector3d getLinearVelocity() const;
+    virtual Eigen::Vector3d getLinearVelocity() const;
     Eigen::Vector3d getVelocity(const Eigen::Vector3d& point) const;
     Eigen::Vector3d getAngularVelocity() const;
     Eigen::Vector3d getForce() const;

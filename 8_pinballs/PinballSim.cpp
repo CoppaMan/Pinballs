@@ -13,7 +13,8 @@ bool PinballSim::advance() {
 
     if(!ballOnTable && balls > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
         p_ball->reset();
-        p_ball->setPosition(Eigen::Vector3d(4.7, -2.5, 4.5));
+        p_ball->setPosition(Eigen::Vector3d(4.7, -1.1, 4.5));
+        p_ball->setLinearVelocity(Eigen::Vector3d(0, -0.3, 1));
         ballOnTable = true;
     }
 
