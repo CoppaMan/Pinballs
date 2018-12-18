@@ -210,7 +210,7 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, float &timeDe
                 bool CCD = true;
 
                 if(CCD) {
-                    if (GJK::runWithCCD(A, obj1->getLinearVelocity()*timeDelta, B, obj2->getLinearVelocity()*timeDelta, contact)) {
+                    if (GJK::runWithCCD(A, B, contact, timeDelta)) {
                         m_contacts.push_back(contact);
                     }
                 } else {
@@ -223,7 +223,7 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, float &timeDe
     }
 }
 
-void CollisionDetection::applyImpulse(double eps) {
+void CollisionDetection::applyImpulse(float &timeDelta, double eps) {
     // compute impulse for all contacts
     for (auto contact : m_contacts) {
 
@@ -247,9 +247,6 @@ void CollisionDetection::applyImpulse(double eps) {
             continue;
         }
 
-
-
-        // TODO: compute impulse and update the following momentums
         Eigen::Vector3d numerator = -(1 + eps) * vrel_vec;
         double t1 = contact.a->getMassInv();
         double t2 = contact.b->getMassInv();

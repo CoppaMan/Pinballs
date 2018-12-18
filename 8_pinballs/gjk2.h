@@ -52,51 +52,72 @@ public:
         return false;
     }
 
-    static bool runWithCCD(const Shape &A, vec3 vel_a, const Shape &B, vec3 vel_b, Contact &contact) {
-        int CCD_STEPS = 3;
+    static bool runWithCCD(const Shape &A, const Shape &B, Contact &contact, double timeDelta) {
+        int CCD_STEPS = 32;
         int GJK_MAXITR = 32;
         vec3 a_b, b_b, c_b, d_b;
-        bool does_collide;
+        vec3 vel_a = contact.a->getLinearVelocity()*timeDelta;
+        vec3 vel_b = contact.b->getLinearVelocity()*timeDelta;
+        vec3 rot_a = contact.a->getAngularVelocity()*timeDelta;
+        vec3 rot_b = contact.b->getAngularVelocity()*timeDelta;
+        Eigen::MatrixXd A_b(A.V.rows(), A.V.cols());
+        Eigen::MatrixXd B_b(B.V.rows(), B.V.cols());
+        double ratio = 1; // Fraction of velocity at which both objects touch the first time
+        double factor = 1;
+        double dir;
 
         for(int steps = 0; steps < CCD_STEPS; steps++) {
-            does_collide = false;
+
+            // 1. Check for collision
             vec3 new_search_dir = A.V.row(0).transpose() - B.V.row(0).transpose();
             vec3 a,b,c,d;
             int num_dim = 0;
             a = support(new_search_dir, A, B); // support in direction of origin
             num_dim++;
-        
+            bool does_collide = false;
+
             for (int iters = 0; iters < GJK_MAXITR; iters++) {
                 if (closest_point_to_simplex(a,b,c,d, new_search_dir,  num_dim)) {
                     does_collide = true;
                 }
                 a = support(new_search_dir, A, B);
                 if (a.dot(new_search_dir) < 0) break;
-                if(does_collide) break;
-            } 
+            }
 
             if(!does_collide && steps == 0) {
                 std::cout << "No initial collision" << std::endl;
                 return false; // Stop if original position doesn't collide
             }
 
+            // 2. Check position
             std::cout << "CCD pass " << steps + 1 << " => ";
-            vel_a /= 2;
-            vel_b /= 2;
-            if(does_collide) { // Move half a step backward (still colliding)
+            if(does_collide) { // Move and rotate half a step back (still colliding)
                 std::cout << "Collision" << std::endl;
                 a_b = a; b_b = b; c_b = c; d_b = d;
-                A.V = A.V.rowwise() - vel_a.transpose();
-                B.V = B.V.rowwise() - vel_b.transpose();
-            } else { // Move half a step forward (not colliding anymore)
+                A_b = A.V; B_b = B.V;
+                dir = -1;
+                contact.ratio = ratio;
+            } else {
                 std::cout << "No collision" << std::endl;
-                A.V = A.V.rowwise() + vel_a.transpose();
-                B.V = B.V.rowwise() + vel_b.transpose();
+                dir = 1;
+            }
+
+            // 3. Correction
+            if(steps < CCD_STEPS-1) {
+                factor /= 2;
+                ratio = ratio + dir*factor;
+                vel_a /= 2;
+                vel_b /= 2;
+                A.V = A.V.rowwise() + vel_a.transpose()*(ratio - 1);
+                B.V = B.V.rowwise() + vel_b.transpose()*(ratio - 1);
             }
         }
+
+        // 4. Find collision parameters
         vec3 normal;
         float penetration;
         vec3 p;
+        A.V = A_b; B.V = B_b;
         if (EPA(a_b, b_b, c_b, d_b, A, B, normal, penetration, p)) { //EPA finds collision data
             contact.p = p;
             contact.n = normal;
@@ -105,6 +126,8 @@ public:
         }
         return false;
     }
+
+
 
     static vec3 handle_line(vec3 &a, vec3 &b, vec3 &c, vec3 &d, int &num_dim) {
         vec3 ab = b - a;

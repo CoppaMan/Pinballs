@@ -32,7 +32,7 @@ struct Contact {
     Eigen::Vector3d n;   // outwards pointing normal of face
     Eigen::Vector3d p;   // world-space vertex location
     float penetration; // negative for seperating objects
-
+    double ratio; // how much of both velocities are needed for first contact
 
     Eigen::Vector3d ea;  // edge direction for A
     Eigen::Vector3d eb;  // edge direction for B
@@ -157,7 +157,7 @@ class CollisionDetection {
 
 	void computeNarrowPhase(int narrowPhaseMethod, float &timeDelta);
 
-	void applyImpulse(double eps = 1.0);
+	void applyImpulse(float &timeDelta, double eps = 1.0);
 
     void clearDataStructures() {
         m_penetratingEdges.clear();
@@ -174,7 +174,7 @@ class CollisionDetection {
 
         computeNarrowPhase(narrowPhaseMethod, timeDelta);
 
-        applyImpulse(eps);
+        applyImpulse(timeDelta, eps);
     }
 
     std::vector<Contact> getContacts() { return m_contacts; }
