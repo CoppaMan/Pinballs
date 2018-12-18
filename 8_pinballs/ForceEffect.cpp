@@ -6,7 +6,9 @@ ForceEffect::ForceEffect(PinballSim *sim, Eigen::Vector3d force, bool rel) : Eff
 }
 
 void ForceEffect::run(std::shared_ptr<RigidObject> other) {
-    std::cout << "Excert force" << std::endl;
-    if(other->getType() == ObjType::DYNAMIC)
-        other->setLinearVelocity(other->getLinearVelocity() + (rel ? parent->getRotation() : Eigen::Quaterniond::Identity()) * force);
+    Eigen::Vector3d res = (rel ? parent->getRotation() : Eigen::Quaterniond::Identity()) * force;
+    if(other->getType() == ObjType::DYNAMIC) {
+        other->setLinearMomentum(other->getLinearMomentum() + res);
+        std::cout << "Excert force: " << std::endl << res << std::endl;
+    }
 }

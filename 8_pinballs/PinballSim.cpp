@@ -21,15 +21,14 @@ bool PinballSim::advance() {
     // add gravity only to ball
     p_ball->applyForceToCOM(m_gravity);
 
-    p_paddle_r->toggle(); //Makes the paddles controlable
-    p_paddle_l->toggle();
+    p_paddle_r->toggle(m_dt); //Makes the paddles controlable
+    p_paddle_l->toggle(m_dt);
 
     //Score demo, press S key for more score
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))score->addScore(1);
 
     for (auto o : m_objects) {
         for (auto e : o->getEffects()) e->updateEffect();
-        //if(o->getType() != ObjType::DYNAMIC) continue;
 
         // integrate velocities
         o->setLinearMomentum(o->getLinearMomentum() + m_dt * o->getMassInv() * o->getForce());

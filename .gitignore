@@ -1,5 +1,7 @@
 build/
+release/
 .DS_Store
 .vscode
 .clang-format
+.blend1
 cmake-build-debug

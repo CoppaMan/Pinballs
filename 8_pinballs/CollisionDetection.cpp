@@ -207,7 +207,7 @@ void CollisionDetection::computeNarrowPhase(int narrowPhaseMethod, float &timeDe
                     continue;
                 }
                 
-                bool CCD = false;
+                bool CCD = true;
 
                 if(CCD) {
                     if (GJK::runWithCCD(A, obj1->getLinearVelocity()*timeDelta, B, obj2->getLinearVelocity()*timeDelta, contact)) {
@@ -265,31 +265,30 @@ void CollisionDetection::applyImpulse(double eps) {
         Eigen::Vector3d j = numerator / (t1 + t2 + t3 + t4);
         Eigen::Vector3d force = (j.dot(contact.n) * contact.n);
 
-
-
         vec3 tangent = (contact.n.cross(vrel_vec).cross(contact.n)).normalized();
 
+        if(contact.a->getType() == ObjType::ROTATION_ONLY || contact.a->getType() == ObjType::ROTATION_ONLY) {
+            force *= 2;
+        } else {
+            force *= 0.8;
+        }
 
         if (contact.a->getType() == ObjType::DYNAMIC) {
             float mu = 0.42;
             vec3 friction = mu*j.dot(-contact.n)*tangent;
-            force *= 0.9;
             contact.a->setLinearMomentum(contact.a->getLinearMomentum() + force);
             contact.a->setAngularMomentum(contact.a->getAngularMomentum() +  ra.cross(force));
-
-            float e = 0.9;
             
+            float e = 0.9;
             float d = contact.a->getLinearMomentum().dot(contact.n);
             float k = - ( 1 + e ) * d;
             float j2 = k < 0 ? 0 : k;
             contact.a->setLinearMomentum(contact.a->getLinearMomentum() + j2*contact.n);
-            
         }
 
         if (contact.b->getType() == ObjType::DYNAMIC) {
             float mu = 0.42;
             vec3 friction = mu*j.dot(contact.n)*tangent;
-            //force += friction;
             contact.b->setLinearMomentum(contact.b->getLinearMomentum() - force);
             contact.b->setAngularMomentum(contact.b->getAngularMomentum() -  rb.cross(force));
         }
@@ -298,6 +297,7 @@ void CollisionDetection::applyImpulse(double eps) {
             contact.a->printDebug("After update");
             contact.b->printDebug("After update");
         }
+
         //Apply effects stored in RigidObjects eg.
         //play sound effect or increase score
         for(auto e : contact.a->getEffects()) e->apply(contact.b);

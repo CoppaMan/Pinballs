@@ -8,18 +8,13 @@
 class Paddle : public RigidObject {
     public:
         Paddle(std::shared_ptr<Table> table, sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left);
-        void toggle();
+        void toggle(double dt);
         void reset_paddle();
 
         Eigen::Vector3d getLinearVelocity() const override {
             return Eigen::Vector3d(0,0,0);
         
         }
-
-        virtual Eigen::Vector3d getForce() const override {
-            return Eigen::Vector3d(1,1,-1);
-        }
-
 
     private:
         std::shared_ptr<Table> parent;

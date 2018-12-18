@@ -70,6 +70,11 @@ void RigidObject::setType(ObjType t) {
         m_force.setZero();
         m_torque.setZero();
     }
+    
+    if (m_type == ObjType::ROTATION_ONLY) {
+        m_mass = std::numeric_limits<double>::infinity();
+        m_massInv = 0.0;
+    }
 }
 
 void RigidObject::setMass(double m) {

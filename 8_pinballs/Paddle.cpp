@@ -1,7 +1,8 @@
 #include "Paddle.h"
 #include <iostream>
 
-Paddle::Paddle(std::shared_ptr<Table> table, sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left) : RigidObject("flipper.off", ObjType::ROTATION_ONLY), parent(table), paddle_key(k), facing_left(look_left) {
+Paddle::Paddle(std::shared_ptr<Table> table, sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left) :
+    RigidObject("flipper.off", ObjType::ROTATION_ONLY), parent(table), paddle_key(k), facing_left(look_left) {
     pos = table->getRotation()*p;
 
     Eigen::Matrix3d flip;
@@ -27,8 +28,8 @@ void Paddle::reset_paddle() { //Sets paddle back to original orientation
     setRotation(abs_rot);
 }
 
-void Paddle::toggle() { //Control paddle with key set in paddle_key
-    Eigen::Vector3d axis = 5*abs_rot*Eigen::Vector3d(0, 1, 0);
+void Paddle::toggle(double dt) { //Control paddle with key set in paddle_key
+    Eigen::Vector3d axis = dt*700*abs_rot*Eigen::Vector3d(0, 1, 0);
 
     Eigen::Matrix3d flip;
     double phi = M_PI; 
@@ -46,20 +47,21 @@ void Paddle::toggle() { //Control paddle with key set in paddle_key
             soundActive.play();
             active = true;
         }
+        //If paddle in lower half or not high enough
         if(loc_rot(0,0) > 0.8 || loc_rot(0,2) < 0) {
-            setAngularMomentum(axis);
+            setAngularVelocity(axis);
         } else {
-            setAngularMomentum(Eigen::Vector3d::Zero());
+            setAngularVelocity(Eigen::Vector3d::Zero());
         }
     } else {
         if(active) {
             soundInactive.play();
             active = false;
         }
-        if(loc_rot(0,0) > 0.88 || loc_rot(0,2) > 0) {
-            setAngularMomentum(-axis);
+        if(loc_rot(0,0) > 0.9 || loc_rot(0,2) > 0) {
+            setAngularVelocity(-axis);
         } else {
-            setAngularMomentum(Eigen::Vector3d::Zero());
+            setAngularVelocity(Eigen::Vector3d::Zero());
         }
     }
 }
