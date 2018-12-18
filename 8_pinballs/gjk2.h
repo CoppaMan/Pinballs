@@ -90,7 +90,7 @@ public:
             }
 
             // 2. Check position
-            std::cout << "CCD pass " << steps + 1 << " => ";
+            std::cout << "CCD pass " << steps + 1 << " Ratio: " << ratio << " => ";
             if(does_collide) { // Move and rotate half a step back (still colliding)
                 std::cout << "Collision" << std::endl;
                 a_b = a; b_b = b; c_b = c; d_b = d;
@@ -106,10 +106,8 @@ public:
             if(steps < CCD_STEPS-1) {
                 factor /= 2;
                 ratio = ratio + dir*factor;
-                vel_a /= 2;
-                vel_b /= 2;
-                A.V = A.V.rowwise() + vel_a.transpose()*(ratio - 1);
-                B.V = B.V.rowwise() + vel_b.transpose()*(ratio - 1);
+                A.V = A.V.rowwise() + dir*vel_a.transpose()*factor;
+                B.V = B.V.rowwise() + dir*vel_b.transpose()*factor;
             }
         }
 
