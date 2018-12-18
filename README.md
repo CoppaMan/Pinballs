@@ -3,6 +3,12 @@
 ## Disclaimer
 This project is built upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next section was implemented by Simon Huber and Dario Morandini.
 
+## Compiling the project
+The project can be compiled with the same directives as for the exercide framework. One additional requirement is the dynamic library SFML.
+
+## Demonstration video
+https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
+
 ## Implemented functionality
 
 ### Effects
