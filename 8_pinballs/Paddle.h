@@ -15,6 +15,12 @@ class Paddle : public RigidObject {
             return Eigen::Vector3d(0,0,0);
         
         }
+
+        virtual Eigen::Vector3d getForce() const override {
+            return Eigen::Vector3d(1,1,-1);
+        }
+
+
     private:
         std::shared_ptr<Table> parent;
         sf::Keyboard::Key paddle_key;

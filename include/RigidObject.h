@@ -63,7 +63,7 @@ class RigidObject : public BaseObject {
     virtual Eigen::Vector3d getLinearVelocity() const;
     Eigen::Vector3d getVelocity(const Eigen::Vector3d& point) const;
     Eigen::Vector3d getAngularVelocity() const;
-    Eigen::Vector3d getForce() const;
+    virtual Eigen::Vector3d getForce() const;
     Eigen::Vector3d getTorque() const;
 #pragma endregion GettersAndSetters
 
