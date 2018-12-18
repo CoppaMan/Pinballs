@@ -35,13 +35,14 @@ public:
     int springStrength = 20;
 
     bool ballOnTable = false;
-    int balls = 3;
+    int n_balls = 3;
+    int curr_ball = 0;
 
     std::shared_ptr<Eigen::Vector3d> spring;
 
     // SCENE OBJECS
     std::shared_ptr<Table> p_table;
-    std::shared_ptr<Ball> p_ball;
+    std::vector<std::shared_ptr<Ball>> p_balls;
     std::shared_ptr<Paddle> p_paddle_r;
     std::shared_ptr<Paddle> p_paddle_l;
     std::shared_ptr<Obstacle> guard_l;
@@ -71,8 +72,14 @@ public:
         dampSound = std::make_shared<SoundEffect>(this, "bump.ogg");
 
         m_objects.clear();
-        p_ball = std::make_shared<Ball>();
-        m_objects.emplace_back(p_ball);
+
+        for (int i = 0; i < n_balls; i++) {
+            std::shared_ptr<Ball> p_ball = std::make_shared<Ball>();
+            m_objects.emplace_back(p_ball);    
+            p_balls.emplace_back(p_ball);
+        }
+
+        
 
         p_table = std::make_shared<Table>();
         p_table->emplaceInto(&m_objects);
@@ -116,16 +123,18 @@ public:
         for (auto &o : m_objects) {
             o->reset();
         }
-        balls = 3;
+        
 
         p_table->resetTable();
 
-        p_ball->setScale(0.010);
-        p_ball->setPosition(Eigen::Vector3d(0, -10, 0));
-        p_ball->setMass(1);
-        Eigen::MatrixXd color(1, 3);
-        color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
-        p_ball->setColors(color);
+        for (auto p_ball : p_balls) {
+            p_ball->setScale(0.010);
+            p_ball->setPosition(Eigen::Vector3d(0, -10, 0));
+            p_ball->setMass(1);
+            Eigen::MatrixXd color(1, 3);
+            color << 0.0, 204.0 / 255.0, 102.0 / 255.0;
+            p_ball->setColors(color);
+        }
 
         p_paddle_r->reset_paddle(); //resets the paddle state
         p_paddle_l->reset_paddle();

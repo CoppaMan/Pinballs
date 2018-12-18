@@ -6,20 +6,19 @@ bool PinballSim::advance() {
     float mt_old = m_dt;
     m_collisionDetection.computeCollisionDetection(m_dt, 1, 2, m_eps);
 
-    if (p_ball->getPosition()(1) < -5 && ballOnTable) {
-        balls--;
-        ballOnTable = false;
-    }
 
-    if(!ballOnTable && balls > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+        auto p_ball = p_balls[curr_ball];
         p_ball->reset();
         p_ball->setPosition(Eigen::Vector3d(4.7, -1.1, 4.5));
         p_ball->setLinearVelocity(Eigen::Vector3d(0, -0.3, 1));
-        ballOnTable = true;
+        
+        curr_ball = (curr_ball + 1) % n_balls;
     }
 
     // add gravity only to ball
-    p_ball->applyForceToCOM(m_gravity);
+    for (auto p_ball: p_balls)
+        p_ball->applyForceToCOM(m_gravity);
 
     p_paddle_r->toggle(m_dt); //Makes the paddles controlable
     p_paddle_l->toggle(m_dt);
@@ -55,10 +54,12 @@ bool PinballSim::advance() {
 
 
     // check if ball is under table and if yes move along the normal to get out of there
-    Contact coni;
-    if (m_collisionDetection.isTableCollision(p_ball, p_table->m_table_surface, coni)) {
-        // if everything went smoothly we should not be here
-        p_ball->setPosition(p_ball->getPosition() + coni.n * coni.penetration);
+    for (auto p_ball: p_balls) {
+        Contact coni;
+        if (m_collisionDetection.isTableCollision(p_ball, p_table->m_table_surface, coni)) {
+            // if everything went smoothly we should not be here
+            p_ball->setPosition(p_ball->getPosition() + coni.n * coni.penetration);
+        }
     }
 
     m_time += m_dt;
