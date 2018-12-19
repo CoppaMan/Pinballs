@@ -4,6 +4,7 @@
 #include <RigidObject.h>
 #include "BoundingSphere.h"
 
+// Wrapper for the ball object
 class Ball : public RigidObject {
 public:
     Ball() : RigidObject("sphere.off", ObjType::DYNAMIC, BOUNDING_TYPE::SPHERE) {

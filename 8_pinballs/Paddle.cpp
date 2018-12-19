@@ -1,6 +1,7 @@
 #include "Paddle.h"
 #include <iostream>
 
+// Similar to Obstacles, the paddle is described local coords
 Paddle::Paddle(std::shared_ptr<Table> table, sf::Keyboard::Key k, Eigen::Vector3d p, bool look_left) :
     RigidObject("flipper.off", ObjType::ROTATION_ONLY), parent(table), paddle_key(k), facing_left(look_left) {
     pos = table->getRotation()*p;
@@ -14,6 +15,7 @@ Paddle::Paddle(std::shared_ptr<Table> table, sf::Keyboard::Key k, Eigen::Vector3
     loc_rot = Eigen::Matrix3d::Identity();
     abs_rot = look_left ? parent->getRotation() * flip : parent->getRotation();
 
+// Loading the sound effects from sound
     bufferActive.loadFromFile("../../sound/flipUp.ogg");
     soundActive.setBuffer(bufferActive);
     soundActive.setVolume(100);
@@ -58,6 +60,7 @@ void Paddle::toggle(double dt) { //Control paddle with key set in paddle_key
             soundInactive.play();
             active = false;
         }
+        // Similar as above, now with swapped quadrants
         if(loc_rot(0,0) > 0.9 || loc_rot(0,2) > 0) {
             setAngularVelocity(-axis);
         } else {

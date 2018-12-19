@@ -6,7 +6,7 @@
 #include "SFML/System/Clock.hpp"
 #include "RigidObject.h"
 
-// forward declr
+// forward declaration, RigidBody and Effect being composed of one anther
 class PinballSim;
 class RigidObject;
 

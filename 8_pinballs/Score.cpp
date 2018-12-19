@@ -13,6 +13,8 @@ void Score::print_score() {
     }
 }
 
+// Adds number of points to the score before being cut off,
+// giving the digits a number to represent
 void Score::addScore(int number) {
     score += number;
     if(score > maxScore) score = maxScore;

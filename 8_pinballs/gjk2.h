@@ -53,7 +53,7 @@ public:
     }
 
     static bool runWithCCD(const Shape &A, const Shape &B, Contact &contact, double timeDelta) {
-        int CCD_STEPS = 32;
+        int CCD_STEPS = 32; // How many binary search steps (including initial collision) we are going to make
         int GJK_MAXITR = 32;
         vec3 a_b, b_b, c_b, d_b;
         vec3 vel_a = contact.a->getLinearVelocity()*timeDelta;
@@ -62,13 +62,14 @@ public:
         vec3 rot_b = contact.b->getAngularVelocity()*timeDelta;
         Eigen::MatrixXd A_b(A.V.rows(), A.V.cols());
         Eigen::MatrixXd B_b(B.V.rows(), B.V.cols());
-        double ratio = 1; // Fraction of velocity at which both objects touch the first time
-        double factor = 1;
-        double dir;
+        double ratio = 1; // Fraction of velocity at which both objects touch the first time,
+        // currently not used but can be usefull for backtracking the velocity vector
+        double factor = 1; // size of correction
+        double dir; // direction to walk to
 
         for(int steps = 0; steps < CCD_STEPS; steps++) {
 
-            // 1. Check for collision
+            // 1. Check for collision with GJK
             vec3 new_search_dir = A.V.row(0).transpose() - B.V.row(0).transpose();
             vec3 a,b,c,d;
             int num_dim = 0;
@@ -91,18 +92,19 @@ public:
 
             // 2. Check position
             std::cout << "CCD pass " << steps + 1 << " Ratio: " << ratio << " => ";
-            if(does_collide) { // Move and rotate half a step back (still colliding)
+            if(does_collide) { // Move half a step back (still colliding)
                 std::cout << "Collision" << std::endl;
                 a_b = a; b_b = b; c_b = c; d_b = d;
                 A_b = A.V; B_b = B.V;
                 dir = -1;
                 contact.ratio = ratio;
             } else {
+                // Move half a step forward to reach next possible collision
                 std::cout << "No collision" << std::endl;
                 dir = 1;
             }
 
-            // 3. Correction
+            // 3. Apply correction
             if(steps < CCD_STEPS-1) {
                 factor /= 2;
                 ratio = ratio + dir*factor;
@@ -111,7 +113,7 @@ public:
             }
         }
 
-        // 4. Find collision parameters
+        // 4. Find collision parameters after we found the best position with EPA
         vec3 normal;
         float penetration;
         vec3 p;

@@ -6,7 +6,7 @@ void Segment::resetSegment(bool is_on) {
     toggleSegment(is_on);
     setPosition(pos);
     resetMembers();
-    if(horizontal) {
+    if(horizontal) { // The middle RigidBody segments need to be rotated
         Eigen::Matrix3d rotation_z;
         double theta = M_PI/2.0; //rotate around FRONT (z-axis) counter-clock wise
         rotation_z << std::cos(theta), -std::sin(theta), 0,
@@ -17,6 +17,7 @@ void Segment::resetSegment(bool is_on) {
     setScale(0.5);
 }
 
+// Sets the color of segment, making it shine red if on and black else
 void Segment::toggleSegment(bool state) {
     is_active = state;
     Eigen::MatrixXd color(1, 3);

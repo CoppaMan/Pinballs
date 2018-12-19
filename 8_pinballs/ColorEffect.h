@@ -2,6 +2,7 @@
 
 #include "Effect.h"
 
+// Fade determines how to interpolate between original and target color
 enum Fade {CONSTANT, LINEAR};
 
 class ColorEffect : public Effect {

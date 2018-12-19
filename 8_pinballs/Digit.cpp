@@ -2,6 +2,7 @@
 #include "Digit.h"
 #include "Segment.h"
 
+// Create the seven segments locally
 Digit::Digit(Eigen::Vector3d p) : pos(p) , digit(0) {
     segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,2,0), true));
     segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-1,1.5,0), false));
@@ -12,11 +13,12 @@ Digit::Digit(Eigen::Vector3d p) : pos(p) , digit(0) {
     segments.push_back(std::make_shared<Segment>(pos + Eigen::Vector3d(-0.5,0,0), true));
 }
 
+//Update the digit to number d
 void Digit::update_digit(int d) {
 
     digit = d;
 
-    switch (digit) {
+    switch (digit) { // Determine which segments are on
         case 0: allTrue(bitmap); bitmap[3] = false; break;
         case 1: allFalse(bitmap); bitmap[2] = true; bitmap[5] = true; break;
         case 2: allTrue(bitmap); bitmap[1] = false; bitmap[5] = false; break;
@@ -28,7 +30,7 @@ void Digit::update_digit(int d) {
         case 8: allTrue(bitmap); break;
         case 9: allTrue(bitmap); bitmap[4] = false; break;
     }
-
+    // Apply them to the segments
     for(int i = 0; i < 7; i++) {
         segments[i]->toggleSegment(bitmap[i]);
     }

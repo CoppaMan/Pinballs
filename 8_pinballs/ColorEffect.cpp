@@ -9,6 +9,7 @@ Effect(sim, 0.5), fadeType(fadeType), duration(duration) {
     targetColor << targetCol(0), targetCol(1), targetCol(2);
 }
 
+//initiate the color change
 void ColorEffect::run(std::shared_ptr<RigidObject> other) {
     if(init) {
         timer.restart();
@@ -17,6 +18,7 @@ void ColorEffect::run(std::shared_ptr<RigidObject> other) {
     }
 }
 
+// update the current color to the next according to the fade
 void ColorEffect::updateEffect() {
     if(!init) {
         if(timer.getElapsedTime().asSeconds() < duration) { // Still in transition
@@ -24,16 +26,16 @@ void ColorEffect::updateEffect() {
             Eigen::MatrixXd mix(1,3);
 
             switch(fadeType) {
-                case Fade::CONSTANT:
+                case Fade::CONSTANT: // Keep target color until very end of timer
                     mix = targetColor;
                     break;
-                case Fade::LINEAR:
+                case Fade::LINEAR: // Mix them
                     mix = (1-frac)*targetColor + frac*originalColor;
                     break;
             }
-
             const Eigen::MatrixXd current = mix;
             parent->setColors(current);
+
         } else { // Change back to original color
             const Eigen::MatrixXd current = originalColor;
             parent->setColors(current);
@@ -42,6 +44,7 @@ void ColorEffect::updateEffect() {
     }
 }
 
+// Remember original color
 void ColorEffect::objectInit() {
     parent->getColors(originalColor);
 }

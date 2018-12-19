@@ -5,6 +5,7 @@ ForceEffect::ForceEffect(PinballSim *sim, Eigen::Vector3d force, bool rel) : Eff
 
 }
 
+// Add the force to the other collider, either in relative or absolute coordinates
 void ForceEffect::run(std::shared_ptr<RigidObject> other) {
     Eigen::Vector3d res = (rel ? parent->getRotation() : Eigen::Quaterniond::Identity()) * force;
     if(other->getType() == ObjType::DYNAMIC) {

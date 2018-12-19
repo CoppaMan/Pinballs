@@ -13,7 +13,7 @@ Table::Table() {
             std::make_shared<RigidObject>("table_surface.off", ObjType::STATIC, BOUNDING_TYPE ::BOX, true);
     parts.push_back(m_table_surface);
     
-
+    // Loading all the other table components into the simulation
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_l.off", ObjType::STATIC));
     parts.emplace_back(std::make_shared<RigidObject>("table_wall_r.off", ObjType::STATIC));
 
