@@ -6,9 +6,15 @@ This project is built upon the exercise framework of the Physically-based Simula
 ## Compiling the project
 The project can be compiled with the same directives as for the exercide framework. One additional requirement is the dynamic library SFML.
 
+
+## Project Presentations
+- Project Introduction: https://docs.google.com/presentation/d/13hZBWNBJWIUGUl8o-nl4So_00HFmScay813Xa9ILxs8/edit?usp=sharing
+- Milestones: https://docs.google.com/presentation/d/1g-YJ9eIOaLUTn--ezqx5tXPgiCXUQ7etN0Hz8Ovv49Y/edit?usp=sharing
+- Final: https://docs.google.com/presentation/d/1y-D4_HHPXiFdv9KLpba9SAw5Yb1Uuq2BKoNT4LCxIUQ/edit?usp=sharing
+
 ## Demonstration video
-1 ball + sound: https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
-multiple balls: https://www.youtube.com/watch?v=21iKxu6ihqk
+- 1 ball + sound: https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
+- multiple balls: https://www.youtube.com/watch?v=21iKxu6ihqk
 
 
 
