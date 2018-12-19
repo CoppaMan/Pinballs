@@ -295,7 +295,7 @@ public:
         int num_faces = 4;
         int closest_face;
 
-        for(int iterations=0; iterations<EPA_MAX_NUM_ITERATIONS; iterations++){
+        for(int iterations=0; iterations< EPA_MAX_NUM_ITERATIONS; iterations++){
             //Find face that's closest to origin
             float min_dist = faces[0][0].dot(faces[0][3]);
             closest_face = 0;
@@ -312,7 +312,7 @@ public:
             vec3 p = support(search_dir, A, B);
 
             if(p.dot(search_dir) - min_dist < EPSILON) {
-                //Convergence (new point is not significantly further from origin)
+                //Convergence
                 normal = -faces[closest_face][3];
                 penetration = p.dot(search_dir);
 
@@ -328,13 +328,13 @@ public:
             int num_loose_edges = 0;
 
             //Find all triangles that are facing p
-            for(int i=0; i<num_faces; i++)
+            for(int i = 0; i < num_faces; i++)
             {
                 if(faces[i][3].dot(p-faces[i][0]) > 0) //triangle i faces p, remove it
                 {
                     //Add removed triangle's edges to loose edge list.
                     //If it's already there, remove it (both triangles it belonged to are gone)
-                    for(int j=0; j<3; j++) //Three edges per face
+                    for(int j= 0; j < 3; j++) //Three edges per face
                     {
                         vec3 current_edge[2] = {faces[i][j], faces[i][(j + 1) % 3]};
                         bool found_edge = false;
@@ -342,19 +342,15 @@ public:
                         {
                             if(loose_edges[k][1] == current_edge[0] && loose_edges[k][0] == current_edge[1]){
                                 //Edge is already in the list, remove it
-                                //THIS ASSUMES EDGE CAN ONLY BE SHARED BY 2 TRIANGLES (which should be true)
-                                //THIS ALSO ASSUMES SHARED EDGE WILL BE REVERSED IN THE TRIANGLES (which
-                                //should be true provided every triangle is wound CCW)
                                 loose_edges[k][0] = loose_edges[num_loose_edges-1][0]; //Overwrite current edge
                                 loose_edges[k][1] = loose_edges[num_loose_edges-1][1]; //with last edge in list
                                 num_loose_edges--;
                                 found_edge = true;
                                 k=num_loose_edges; //exit loop because edge can only be shared once
                             }
-                        }//endfor loose_edges
+                        }
 
                         if(!found_edge){ //add current edge to list
-                            // assert(num_loose_edges<EPA_MAX_NUM_LOOSE_EDGES);
                             if(num_loose_edges>=EPA_MAX_NUM_LOOSE_EDGES) break;
                             loose_edges[num_loose_edges][0] = current_edge[0];
                             loose_edges[num_loose_edges][1] = current_edge[1];
@@ -369,20 +365,18 @@ public:
                     faces[i][3] = faces[num_faces-1][3];
                     num_faces--;
                     i--;
-                }//endif p can see triangle i
-            }//endfor num_faces
+                }
+            }
 
-            //Reconstruct polytope with p added
-            for(int i=0; i<num_loose_edges; i++)
-            {
-                // assert(num_faces<EPA_MAX_NUM_FACES);
+            // Reconstruct polytope with p added
+            for(int i=0; i < num_loose_edges; i++) {
                 if(num_faces>=EPA_MAX_NUM_FACES) break;
                 faces[num_faces][0] = loose_edges[i][0];
                 faces[num_faces][1] = loose_edges[i][1];
                 faces[num_faces][2] = p;
                 faces[num_faces][3] = ((loose_edges[i][0]-loose_edges[i][1]).cross(loose_edges[i][0]-p)).normalized();
 
-                //Check for wrong normal to maintain CCW winding
+                //Check for wrong normal
                 float bias = 0.000001; //in case dot result is only slightly < 0 (because origin is on face)
                 if(faces[num_faces][0].dot(faces[num_faces][3]) + bias < 0){
                     vec3 temp = faces[num_faces][0];
@@ -392,9 +386,7 @@ public:
                 }
                 num_faces++;
             }
-        } //End for iterations
-        //printf("EPA did not converge\n");
-        //Return most recent closest point
+        }
         return false;
     }
 
