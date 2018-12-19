@@ -31,3 +31,16 @@ Placing **RigidObject**s on a table which has rotation different from the identi
 
 ### Paddle
 The paddle is a **RigidObject** which can be activated by a specified key press. If the key is not pressed, the paddle will return to its resting configuration. Like **Obstacle**s it is placed relative to the table. To catch the key event produced by SFML, a hook is placed in **PinballSim::advance()** with the **toggle()** method. By setting its angular momentum we can handle a **Paddle** collision like any other collision.
+
+### Collision Detection 
+
+- Broad collision: The rigid object has new a getBoundingType() where we have 2 possible bounding types, spheres and bounding boxes. 
+- Narrow collision:
+    Algorithm outline (for each objects pair from AABB): 
+        1. Assert that one of the objects is a dynamic object. 
+        2. If one object is the table surface use specific table collision
+        3. Else use GJK + EPA (gjk2.h)
+
+
+
+### Continuous Collision Detection 
