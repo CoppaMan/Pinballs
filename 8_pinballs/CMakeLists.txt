@@ -44,4 +44,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 add_definitions(-DIGL_VIEWER_VIEWER_QUIET)
 add_executable(${PROJECT_NAME} ${SRCFILES} ${SRC_FILES} ${HFILES} ${H_FILES})
-target_link_libraries(${PROJECT_NAME} igl::core igl::opengl_glfw igl::opengl_glfw_imgui sfml-window sfml-graphics sfml-system)
+target_link_libraries(${PROJECT_NAME} igl::core igl::opengl_glfw igl::opengl_glfw_imgui sfml-window sfml-graphics sfml-system sfml-audio)

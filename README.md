@@ -7,7 +7,10 @@ This project is built upon the exercise framework of the Physically-based Simula
 The project can be compiled with the same directives as for the exercide framework. One additional requirement is the dynamic library SFML.
 
 ## Demonstration video
-https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
+1 ball + sound: https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
+multiple balls: https://www.youtube.com/watch?v=21iKxu6ihqk
+
+
 
 ## Implemented functionality
 
@@ -40,6 +43,8 @@ The paddle is a **RigidObject** which can be activated by a specified key press.
         1. Assert that one of the objects is a dynamic object. 
         2. If one object is the table surface use specific table collision
         3. Else use GJK + EPA (gjk2.h)
+
+gjk2.h this header has 2 methods. Either boolean run(Shape &A, Shape &B, Contact &c) which fills the contact data if returns true and if false there is no collision. Or runWithCCD(Shape &A, Shape &B, Contact &c, double timeDelta) which does the same just with continuous collision detection. (Simple binary search sceme) 
 
 
 
