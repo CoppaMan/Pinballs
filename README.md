@@ -1,7 +1,7 @@
 # Physically-based Simulation 2018 - Project of Pinballs
 
 ## Disclaimer
-This project is built upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next section was implemented by Simon Huber and Dario Morandini.
+This project is built upon the exercise framework of the Physically-based Simulation course and uses the SFML library to interface keyboard and speakers. Every other functinality mentioned in the next sections were implemented by Simon Huber and Dario Morandini.
 
 ## Compiling the project
 The project can be compiled with the same directives as for the exercide framework. One additional requirement is the dynamic library SFML.
@@ -11,10 +11,11 @@ The project can be compiled with the same directives as for the exercide framewo
 - Project Introduction: https://docs.google.com/presentation/d/13hZBWNBJWIUGUl8o-nl4So_00HFmScay813Xa9ILxs8/edit?usp=sharing
 - Milestones: https://docs.google.com/presentation/d/1g-YJ9eIOaLUTn--ezqx5tXPgiCXUQ7etN0Hz8Ovv49Y/edit?usp=sharing
 - Final: https://docs.google.com/presentation/d/1y-D4_HHPXiFdv9KLpba9SAw5Yb1Uuq2BKoNT4LCxIUQ/edit?usp=sharing
+Also available locally on the root of this repo
 
 ## Demonstration video
-- 1 ball + sound: https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
-- multiple balls: https://www.youtube.com/watch?v=21iKxu6ihqk
+- One ball + sounds: https://www.youtube.com/watch?v=opUgCQ8sEeQ&feature=youtu.be
+- Multiple balls: https://www.youtube.com/watch?v=21iKxu6ihqk
 
 
 
@@ -55,3 +56,4 @@ gjk2.h this header has 2 methods. Either boolean run(Shape &A, Shape &B, Contact
 
 
 ### Continuous Collision Detection 
+Uses multiple binary search passes to find an interpolated position of two colliding objects which represents the first collision frame. We then perform EPA on this frame resulting in a more accurate penetration depth and normal. It can also be used to backtrack along the velocity vector of both objects to position them before the contact. This can be done using the ratio member of the contact struct which represents by how much of the last velocity vector is not colliding.
